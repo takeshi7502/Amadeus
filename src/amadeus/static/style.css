@@ -49,6 +49,8 @@ html[lang=en] .pending .message-body:empty:after{content:'Thinking…'}
 .local-profile{width:calc(100% + 2 * var(--sidebar-gutter));margin-left:calc(-1 * var(--sidebar-gutter));margin-right:calc(-1 * var(--sidebar-gutter));padding-left:var(--sidebar-gutter);padding-right:var(--sidebar-gutter);text-align:left;border-radius:0}.local-profile:hover{background:#ffffff04}.profile-details{flex:1;min-width:0}.profile-details small{line-height:1.45}.local-profile .private-badge{flex-shrink:0}.account-dialog{max-width:460px}.account-dialog>.primary-button{margin-top:12px}
 /* Markdown stays within the existing compact chat typography. */
 .message-body,.composer textarea{font-family:"IBM Plex Sans","Be Vietnam Pro",sans-serif;font-weight:400;font-synthesis:style}
+.composer{align-items:center}
+.composer textarea{line-height:20px;padding:6px 0;min-height:32px}
 .message-body.markdown-body{white-space:normal}
 .markdown-body>:first-child{margin-top:0}.markdown-body>:last-child{margin-bottom:0}
 .markdown-body p{margin:0 0 .75em}.markdown-body strong{font-weight:700}.markdown-body em{font-style:italic}
