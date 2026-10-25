@@ -2,13 +2,15 @@
 
 Bản production: **https://amadeus-sigma.vercel.app**, project `amadeus` trong
 workspace `takeshis-projects-24f593d8`. Database `amadeus-db` dùng Turso Starter.
-Mật khẩu đăng nhập được lưu riêng tại `.local/deploy/access.txt` trên máy triển khai;
+Mật khẩu đăng nhập admin được lưu riêng tại `.local/deploy/access.txt` trên máy triển khai;
 file này được bỏ qua bởi Git và Vercel.
 
 Vercel chạy FastAPI qua `app.py`, giao diện/model/voice từ thư mục `public/`
-trên CDN. Lịch sử, ký ức, khóa hội thoại và giới hạn lượt nằm ở **Turso**,
-không lưu database trong `/tmp` hoặc filesystem tạm của Function. Mỗi lần
-cold start dùng cùng `AMADEUS_SESSION_SECRET` để giữ đăng nhập và danh tính.
+trên CDN. Web mở công khai; lịch sử và ghi chú khách chỉ nằm trong localStorage
+của từng trình duyệt/domain, không ghi vào DB. Lịch sử, ký ức, khóa hội thoại
+và giới hạn lượt của **admin** nằm ở Turso, không lưu database trong `/tmp`
+hoặc filesystem tạm của Function. Mỗi lần cold start dùng cùng
+`AMADEUS_SESSION_SECRET` để giữ đăng nhập admin.
 
 ## 1. Tạo database và đặt biến môi trường
 
@@ -25,7 +27,7 @@ và Preview. Danh sách tên có trong [`.env.example`](../.env.example):
 | `TURSO_DATABASE_URL` | URL `libsql://...turso.io` hoặc `https://...turso.io` |
 | `TURSO_AUTH_TOKEN` | Token read/write của database |
 | `AMADEUS_SESSION_SECRET` | Chuỗi ngẫu nhiên bí mật ít nhất 32 byte, giữ ổn định qua các lần deploy |
-| `AMADEUS_WEB_PASSWORD` | Mật khẩu vào web, bắt buộc khi deploy |
+| `AMADEUS_WEB_PASSWORD` | Mật khẩu đăng nhập admin ở cuối sidebar; bắt buộc khi deploy, khách chat không cần mật khẩu |
 | `AMADEUS_CHAT_MODEL` | `default/<model thực tế của provider>` |
 | `AMADEUS_API_URL` | URL API công khai, ví dụ `https://<provider>/v1` |
 | `AMADEUS_API_KEY` | API key của provider |
@@ -80,20 +82,31 @@ người dùng. Xem thêm [assets/README.md](../assets/README.md).
 
 ## 3. Kiểm tra sau deploy
 
-Mở `/health`, đăng nhập web, gửi một tin rồi tải lại trang để kiểm tra lịch sử.
+Mở `/health`, vào web không đăng nhập, gửi một tin rồi tải lại trang để kiểm
+tra lịch sử khách. Một trình duyệt khác phải có lịch sử khách trống. Bấm
+**Đăng nhập admin** ở cuối sidebar, nhập mật khẩu hiện có rồi kiểm tra lịch
+sử DB; đăng xuất phải trở về chat khách. Chat khách không tự tải lên DB.
 Thử đổi hai mode, xóa chat, lưu/xóa ghi chú và bật giọng Nhật. `/api/status`
 không công khai key, endpoint provider, database token hoặc thông tin Telegram.
 API dùng cookie HTTPS, kiểm tra Origin và không cho CDN cache dữ liệu riêng.
 Các tài nguyên CDN có header CSP, nosniff và referrer policy tương ứng.
 
 Lượt chat stream bằng SSE, Function giới hạn 180 giây; model mặc định 90 giây.
-Khóa hội thoại được giữ trong database và hết hạn để phục hồi sau Function
+Với admin, khóa hội thoại được giữ trong database và hết hạn để phục hồi sau Function
 bị dừng; không giữ transaction SQLite mở trong lúc chờ model. Retry kiểm tra
 request ID đã lưu để trả lại kết quả cũ. Giới hạn cloud là 12 lượt/phút theo
-cửa sổ phút và theo danh tính (đăng nhập giới hạn theo IP).
+cửa sổ phút và theo danh tính (đăng nhập giới hạn theo IP). Khách dùng endpoint
+stateless `/api/guest/messages`, gửi ngữ cảnh từ trình duyệt, lưu cặp hỏi/đáp
+hoàn tất ở trình duyệt. Không tạo session, message, completion hay lease trong DB.
+Giới hạn khách nằm trong RAM của từng Function: 12 lượt/phút theo cookie khách,
+60 lượt/phút theo IP; bộ đếm không dùng chung giữa các Function/cold start.
 
-Lịch sử local không tự được tải lên cloud. Cookie thuộc domain local và domain
-Vercel tạo hai không gian người dùng khác nhau.
+Lịch sử khách thuộc từng origin của trình duyệt: domain mới có bộ nhớ khách
+riêng, xóa dữ liệu trang sẽ mất bộ nhớ đó. Ngữ cảnh khách vẫn được gửi đến máy
+chủ và provider để tạo câu trả lời, nhưng không ghi vào DB. Cookie admin chỉ
+thuộc domain đang đăng nhập; đăng nhập lại trên domain khác sẽ mở cùng lịch sử
+admin trong DB. Nếu còn cookie hợp lệ từ bản cũ, lịch sử cũ của trình duyệt
+đó được chuyển vào không gian admin sau khi nhập đúng mật khẩu.
 
 ## Telegram
 

@@ -38,6 +38,8 @@
 
 @media(max-width:760px){.composer textarea,.sheet-dialog input,.sheet-dialog textarea{font-size:16px}}
 
+/* Account controls keep the compact sidebar layout. */
+.local-profile{width:100%;text-align:left;border-radius:0}.local-profile:hover{background:#ffffff04}.profile-details{flex:1;min-width:0}.profile-details small{line-height:1.45}.local-profile .private-badge{flex-shrink:0}.account-dialog{max-width:460px}.account-dialog>.primary-button{margin-top:12px}
 /* Markdown stays within the existing compact chat typography. */
 .message-body,.composer textarea{font-family:"IBM Plex Sans","Be Vietnam Pro",sans-serif;font-weight:400;font-synthesis:style}
 .message-body.markdown-body{white-space:normal}

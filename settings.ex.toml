@@ -10,7 +10,8 @@ send_temperature = true # Đặt false nếu model không hỗ trợ temperature
 history_chars = 24000
 assets_dir = "runtime_assets" # Model/font tải riêng bằng tools/prepare_assets.py
 web_search_enabled = true # Web: bật Tra cứu mạng; Telegram: /search <câu hỏi>
-# Đặt mật khẩu trước khi public ra Internet. Có thể dùng AMADEUS_WEB_PASSWORD.
+# Mật khẩu đăng nhập admin (AMADEUS_WEB_PASSWORD). Khách vẫn mở web/chat tự do.
+# Để trống khi chạy local sẽ tắt đăng nhập admin; chat khách chỉ lưu trên trình duyệt.
 web_password = ""
 # Bật khi dùng HTTPS qua reverse proxy.
 secure_cookie = false

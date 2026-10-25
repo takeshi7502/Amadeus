@@ -67,7 +67,7 @@ class Settings(BaseModel):
             if self.model_timeout > 120:
                 raise ValueError("Đặt model_timeout tối đa 120 giây khi chạy trên Vercel.")
         if self.host not in {"127.0.0.1", "localhost", "::1"} and not self.web_password:
-            raise ValueError("Đặt web_password hoặc AMADEUS_WEB_PASSWORD trước khi bind ra mạng.")
+            raise ValueError("Đặt mật khẩu admin bằng web_password hoặc AMADEUS_WEB_PASSWORD trước khi bind ra mạng.")
         if self.telegram_enabled and not self.telegram_token:
             raise ValueError("telegram_enabled cần token riêng trong telegram_token.")
         return self

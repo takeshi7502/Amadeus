@@ -1,6 +1,6 @@
 'use strict';
 const $ = (id) => document.getElementById(id);
-const state = {session: null, busy: false, navigating: false, controller: null, retry: null, ready: false, searchEnabled: true, selectedMode: 'amadeus', searchVersion: 0};
+const state = {session: null, busy: false, navigating: false, controller: null, retry: null, ready: false, searchEnabled: true, selectedMode: 'amadeus', searchVersion: 0, role: 'guest', workspace: 0, initializing: 0, loading: false, refreshAuth: false};
 const modeNames = {amadeus: 'Amadeus', lab: 'Kurisu tại lab'};
 
 function element(tag, className, text) {
@@ -15,7 +15,24 @@ function toast(message) {
   clearTimeout(toast.timer);
   toast.timer = setTimeout(() => { $('toast').hidden = true; }, 2800);
 }
-async function api(path, options = {}) {
+function viewKey(key) { return 'amadeus.' + state.role + '.' + key; }
+function viewGet(key) {
+  try { return localStorage.getItem(viewKey(key)) ?? (state.role === 'admin' ? localStorage.getItem('amadeus.' + key) : null); }
+  catch { return null; }
+}
+function viewSet(key, value) {
+  // View preferences are optional; the guest store reports content-save failures.
+  try {
+    if (value === null) localStorage.removeItem(viewKey(key));
+    else localStorage.setItem(viewKey(key), value);
+  } catch { /* Admin DB history remains usable when browser storage is blocked. */ }
+}
+function refreshAuthWhenIdle() {
+  if (!state.refreshAuth || state.busy || state.navigating || state.loading) return;
+  state.refreshAuth = false;
+  initialize();
+}
+async function serverApi(path, options = {}) {
   const response = await fetch('/api' + path, {
     ...options,
     headers: {'Content-Type': 'application/json', ...options.headers},
@@ -23,10 +40,17 @@ async function api(path, options = {}) {
   if (!response.ok) {
     let detail;
     try { detail = (await response.json()).detail; } catch { /* Not JSON. */ }
-    if (response.status === 401) showLogin();
+    if (response.status === 401 && path !== '/login' && state.role === 'admin') {
+      state.refreshAuth = true;
+      refreshAuthWhenIdle();
+    }
     throw new Error(typeof detail === 'string' ? detail : 'Yêu cầu chưa thành công. Kiểm tra kết nối rồi thử lại.');
   }
   return response.json();
+}
+async function api(path, options = {}) {
+  if (state.role === 'guest' && /^\/(sessions|memories)(\/|$)/.test(path)) return window.AmadeusGuestStore.request(path, options);
+  return serverApi(path, options);
 }
 function error(message, canRetry = false) {
   $('error-text').textContent = message;
@@ -43,14 +67,17 @@ function setBusy(busy) {
   $('messages').setAttribute('aria-busy', String(busy));
 }
 function updateControls() {
-  const blocked = state.busy || state.navigating;
+  const blocked = state.busy || state.navigating || state.loading;
   for (const id of ['new-chat', 'mode', 'delete-chat', 'export']) $(id).disabled = blocked;
-  $('send').disabled = state.navigating;
+  $('account-button').disabled = blocked;
+  $('admin-logout').disabled = blocked;
+  $('send').disabled = state.navigating || state.loading;
   $('web-search').disabled = blocked || !state.searchEnabled;
   document.querySelectorAll('.session-open, .session-delete, .suggestions button').forEach((b) => { b.disabled = blocked; });
+  refreshAuthWhenIdle();
 }
 async function navigate(action) {
-  if (state.busy || state.navigating) return;
+  if (state.busy || state.navigating || state.loading) return;
   document.dispatchEvent(new CustomEvent('amadeus:navigate'));
   state.navigating = true;
   updateControls();
@@ -114,7 +141,9 @@ function addMessageActions(main, text, knowledge, sources = []) {
   }
 }
 async function refreshSessions() {
+  const workspace = state.workspace;
   const sessions = await api('/sessions');
+  if (workspace !== state.workspace) return [];
   $('sessions').replaceChildren();
   $('session-count').textContent = String(sessions.length).padStart(2, '0');
   for (const session of sessions) {
@@ -149,10 +178,12 @@ async function refreshSessions() {
 }
 async function loadSession(id) {
   if (state.busy) return;
+  const workspace = state.workspace;
   const session = await api('/sessions/' + id);
+  if (workspace !== state.workspace) return;
   state.session = session;
-  localStorage.setItem('amadeus.active', id);
-  localStorage.setItem('amadeus.last.' + session.mode, id);
+  viewSet('active', id);
+  viewSet('last.' + session.mode, id);
   syncMode(session.mode);
   $('messages').replaceChildren();
   $('welcome').hidden = session.messages.length > 0;
@@ -167,8 +198,8 @@ function showDraft(mode = state.selectedMode, {clearInput = true} = {}) {
   state.session = null;
   state.retry = null;
   syncMode(mode);
-  localStorage.setItem('amadeus.active', 'draft:' + mode);
-  localStorage.setItem('amadeus.last.' + mode, 'draft');
+  viewSet('active', 'draft:' + mode);
+  viewSet('last.' + mode, 'draft');
   $('messages').replaceChildren();
   $('welcome').hidden = false;
   $('error').hidden = true;
@@ -180,7 +211,7 @@ async function newDraft() {
 }
 async function switchMode(mode) {
   if (mode === state.selectedMode) return;
-  const remembered = localStorage.getItem('amadeus.last.' + mode);
+  const remembered = viewGet('last.' + mode);
   const sessions = await api('/sessions');
   const selected = remembered === 'draft' ? null
     : sessions.find((s) => s.mode === mode && s.id === remembered) || sessions.find((s) => s.mode === mode);
@@ -197,7 +228,7 @@ async function deleteSession(id) {
   const deletingActive = state.session?.id === id;
   await api('/sessions/' + id, {method: 'DELETE'});
   for (const mode of Object.keys(modeNames)) {
-    if (localStorage.getItem('amadeus.last.' + mode) === id) localStorage.removeItem('amadeus.last.' + mode);
+    if (viewGet('last.' + mode) === id) viewSet('last.' + mode, null);
   }
   if (deletingActive) showDraft(state.selectedMode, {clearInput: false});
   const sessions = await refreshSessions();
@@ -208,7 +239,7 @@ async function deleteSession(id) {
   toast('Đã xóa hội thoại.');
 }
 async function send(retry = false) {
-  if (state.busy || state.navigating) return;
+  if (state.busy || state.navigating || state.loading) return;
   const request = retry && state.retry ? state.retry : {text: $('input').value.trim(), request_id: crypto.randomUUID(), web_search: $('web-search').checked};
   if (!request.text) return;
   $('error').hidden = true;
@@ -235,6 +266,8 @@ async function send(retry = false) {
     updateControls();
   }
   const sid = state.session.id;
+  const guest = state.role === 'guest';
+  const workspace = state.workspace;
   setBusy(true);
   state.retry = request;
   state.controller = new AbortController();
@@ -248,11 +281,12 @@ async function send(retry = false) {
   let context = [];
   let sources = [];
   try {
-    const response = await fetch(`/api/sessions/${sid}/messages`, {
+    const response = await fetch(guest ? '/api/guest/messages' : `/api/sessions/${sid}/messages`, {
       method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(request), signal: state.controller.signal,
+      body: JSON.stringify(guest ? {...request, ...window.AmadeusGuestStore.context(sid)} : request), signal: state.controller.signal,
     });
     if (!response.ok) {
+      if (response.status === 401 && !guest) state.refreshAuth = true;
       const info = await response.json().catch(() => ({}));
       throw new Error(typeof info.detail === 'string' ? info.detail : `Không gửi được tin nhắn (${response.status}).`);
     }
@@ -289,6 +323,7 @@ async function send(retry = false) {
           context = payload.knowledge || context;
           sources = payload.sources || [];
           window.AmadeusMarkdown.render(assistant.body, answer);
+          if (guest) await window.AmadeusGuestStore.commitTurn(sid, request.request_id, request.text, payload);
           done = true;
         }
       }
@@ -300,21 +335,25 @@ async function send(retry = false) {
     refreshSessions().catch(() => toast('Câu trả lời đã lưu. Danh sách lịch sử sẽ cập nhật khi tải lại trang.'));
   } catch (e) {
     state.controller.abort();
+    if (workspace !== state.workspace) return;
     assistant.article.classList.remove('pending');
     assistant.article.classList.add('interrupted');
     assistant.main.append(element('div', 'interrupted-label', 'Lượt chưa xác nhận hoàn tất'));
+    if (answer.trim()) addMessageActions(assistant.main, answer, context, sources);
     error(e.name === 'AbortError' ? 'Đã dừng nhận câu trả lời. Gửi lại sẽ kiểm tra kết quả đã lưu trước khi gọi model.' : e.message, true);
     $('input').value = request.text;
   } finally {
     setBusy(false);
-    if (done) document.dispatchEvent(new CustomEvent('amadeus:reply', {detail: {userText: request.text}}));
+    if (done && workspace === state.workspace) document.dispatchEvent(new CustomEvent('amadeus:reply', {detail: {userText: request.text}}));
     state.controller = null;
     $('input').focus();
     scrollDown();
   }
 }
 async function renderMemories() {
+  const workspace = state.workspace;
   const notes = await api('/memories');
+  if (workspace !== state.workspace) return;
   $('memory-count').textContent = notes.length;
   $('memory-list').replaceChildren();
   if (!notes.length) $('memory-list').append(element('p', 'empty-note', 'Chưa có ghi chú. Chỉ những điều cậu chủ động lưu mới được thêm vào đây.'));
@@ -367,30 +406,63 @@ function closeSidebar() {
   syncPanelAccess();
 }
 function showLogin() {
+  $('login-error').hidden = true;
   if (!$('login-dialog').open) $('login-dialog').showModal();
 }
+function showRole(role) {
+  state.role = role;
+  const admin = role === 'admin';
+  $('profile-icon').textContent = admin ? 'A' : 'U';
+  $('profile-title').textContent = admin ? 'Không gian admin' : 'Đăng nhập admin';
+  $('profile-description').textContent = admin ? 'Lịch sử lưu trên máy chủ' : 'Lịch sử chỉ trên trình duyệt này';
+  $('profile-badge').textContent = admin ? 'ADMIN' : 'KHÁCH';
+  $('account-button').setAttribute('aria-label', admin ? 'Mở không gian admin' : 'Đăng nhập admin');
+  $('account-button').setAttribute('aria-controls', admin ? 'account-dialog' : 'login-dialog');
+  $('memory-privacy').textContent = admin
+    ? 'Ghi chú admin được lưu trên máy chủ và gửi đến nhà cung cấp AI khi trả lời. Xóa ghi chú sẽ ngừng dùng nó cho các lượt mới.'
+    : 'Ghi chú chỉ lưu trên trình duyệt này, không ghi vào máy chủ. Nội dung liên quan được gửi đến AI khi trò chuyện. Xóa dữ liệu trang sẽ xóa các ghi chú này.';
+}
 async function initialize() {
+  const initializing = ++state.initializing;
+  state.loading = true;
+  updateControls();
+  state.workspace++;
+  state.session = null;
+  state.retry = null;
+  $('messages').replaceChildren();
+  $('sessions').replaceChildren();
+  $('memory-list').replaceChildren();
+  $('memory-count').textContent = '0';
+  $('session-count').textContent = '00';
+  $('welcome').hidden = false;
+  $('input').value = '';
+  $('memory-input').value = '';
+  $('memory-error').hidden = true;
+  $('error').hidden = true;
+  for (const id of ['memory-dialog', 'account-dialog']) if ($(id).open) $(id).close();
   try {
-    const status = await api('/status');
+    const status = await serverApi('/status');
+    if (initializing !== state.initializing) return;
+    showRole(status.role || (status.authenticated ? 'admin' : 'guest'));
     state.ready = status.model_ready;
     state.searchEnabled = status.web_search_enabled;
     $('web-search').disabled = !state.searchEnabled;
     if (!status.web_search_enabled) $('web-search').checked = false;
-    if (!status.authenticated) { showLogin(); return; }
     if ($('login-dialog').open) $('login-dialog').close();
     $('setup-banner').hidden = status.model_ready;
     $('connection-text').textContent = status.model_ready ? 'SẴN SÀNG ĐỐI THOẠI' : 'CHỜ KẾT NỐI MODEL';
     $('connection-dot').classList.toggle('ready', status.model_ready);
     syncMode(status.default_mode);
     const sessions = await refreshSessions();
-    const remembered = localStorage.getItem('amadeus.active');
+    const remembered = viewGet('active');
     if (remembered?.startsWith('draft:') && modeNames[remembered.slice(6)]) showDraft(remembered.slice(6));
     else {
       const selected = sessions.find((s) => s.id === remembered) || sessions[0];
       if (selected) await loadSession(selected.id);
     }
     await renderMemories();
-  } catch (e) { error('Không kết nối được máy chủ. ' + e.message); }
+  } catch (e) { error('Không mở được không gian trò chuyện. ' + e.message); }
+  finally { if (initializing === state.initializing) {state.loading = false; updateControls();} }
 }
 $('chat-form').addEventListener('submit', (e) => { e.preventDefault(); send().catch((e) => error(e.message, Boolean(state.retry))); });
 $('input').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); $('chat-form').requestSubmit(); } });
@@ -426,7 +498,17 @@ document.addEventListener('keydown', (e) => {
 document.querySelectorAll('.suggestions button').forEach((button) => button.addEventListener('click', () => { $('input').value = button.dataset.prompt; $('chat-form').requestSubmit(); }));
 $('export').addEventListener('click', () => {
   if (!state.session) { toast('Chưa có hội thoại để tải.'); return; }
-  const link = element('a'); link.href = `/api/sessions/${state.session.id}/export`; link.download = `amadeus-${state.session.id}.json`; link.click();
+  const sid = state.session.id;
+  if (state.role === 'guest') {
+    api(`/sessions/${sid}/export`).then(data => {
+      const link = element('a');
+      const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'}));
+      link.href = url; link.download = `amadeus-${sid}.json`; link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }).catch(e => error(e.message));
+  } else {
+    const link = element('a'); link.href = `/api/sessions/${state.session.id}/export`; link.download = `amadeus-${state.session.id}.json`; link.click();
+  }
 });
 $('delete-chat').addEventListener('click', async () => {
   if (!state.session) return;
@@ -452,11 +534,40 @@ $('canon-search').addEventListener('input', () => {
   state.searchTimer = setTimeout(() => renderCanon().catch((e) => { $('canon-list').replaceChildren(element('p', 'dialog-error', e.message)); }), 200);
 });
 document.querySelectorAll('.close-dialog').forEach((button) => button.addEventListener('click', () => button.closest('dialog').close()));
-$('login-dialog').addEventListener('cancel', (e) => e.preventDefault());
+$('account-button').addEventListener('click', () => {
+  if (state.busy || state.navigating || state.loading) return;
+  closeSidebar();
+  if (state.role === 'admin') $('account-dialog').showModal();
+  else showLogin();
+});
+$('login-dialog').addEventListener('close', () => { $('password').value = ''; });
+function authChanged() {
+  try { localStorage.setItem('amadeus.auth.changed', crypto.randomUUID()); } catch { /* Cookie still controls authentication. */ }
+}
 $('login-form').addEventListener('submit', async (e) => {
   e.preventDefault(); const button = $('login-form').querySelector('button'); button.disabled = true;
-  try { await api('/login', {method: 'POST', body: JSON.stringify({password: $('password').value})}); $('password').value = ''; await initialize(); }
+  try {
+    await navigate(async () => {
+      await serverApi('/login', {method: 'POST', body: JSON.stringify({password: $('password').value})});
+      $('password').value = ''; authChanged(); await initialize();
+    });
+  }
   catch (e) { $('login-error').textContent = e.message; $('login-error').hidden = false; }
   finally { button.disabled = false; }
+});
+$('admin-logout').addEventListener('click', () => navigate(async () => {
+  await serverApi('/logout', {method: 'POST'});
+  authChanged(); await initialize(); toast('Đã trở về không gian khách trên trình duyệt này.');
+}).catch(e => error(e.message)));
+window.addEventListener('storage', event => {
+  if (event.key === 'amadeus.auth.changed') {state.refreshAuth = true; refreshAuthWhenIdle();}
+  if (event.key === window.AmadeusGuestStore.key && state.role === 'guest' && !state.busy && !state.navigating && !state.loading) {
+    navigate(async () => {
+      const active = state.session?.id, sessions = await refreshSessions();
+      if (active && sessions.some(s => s.id === active)) await loadSession(active);
+      else if (active) showDraft(state.selectedMode, {clearInput: false});
+      await renderMemories();
+    }).catch(e => error(e.message));
+  }
 });
 initialize();

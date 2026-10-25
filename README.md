@@ -123,7 +123,23 @@ Chuẩn bị `runtime_assets/` ở host như trên, điền `settings.toml`, r�
 cần trong container. Image standalone cần mount `runtime_assets` vào `/app/runtime_assets`.
 Chưa chạy kiểm tra Docker thì không suy ra image đã được xác minh trên máy này.
 
-Muốn bind ra mạng, đặt mật khẩu, khai báo `allowed_hosts` đúng host và dùng HTTPS
-qua reverse proxy (`secure_cookie = true`). Mặc định chỉ bind localhost. Cookie
-HttpOnly/SameSite, kiểm tra origin và tách owner áp dụng cho API. Xóa `data/`
-sẽ làm mất lịch sử/ký ức và khóa phiên, không phải thao tác reset giao diện.
+Web mở công khai, không yêu cầu mật khẩu để trò chuyện. Hội thoại và ghi chú
+**khách chỉ lưu trong localStorage của từng trình duyệt/domain**, không ghi vào
+database. Tải lại trang vẫn giữ lịch sử; xóa dữ liệu trang hoặc dùng cửa sổ riêng
+tư có thể làm mất lịch sử. Những người dùng chung một hồ sơ trình duyệt cũng
+dùng chung bộ nhớ khách. Khi gửi tin, ngữ cảnh cần thiết được gửi đến máy chủ
+và nhà cung cấp AI để trả lời, nhưng không lưu vào DB.
+
+Nút **Đăng nhập admin** ở cuối sidebar dùng mật khẩu `web_password` hoặc
+`AMADEUS_WEB_PASSWORD` hiện có. Chỉ hội thoại/ghi chú của admin lưu vào DB;
+đăng nhập cùng mật khẩu ở thiết bị khác mở cùng lịch sử admin. Đăng xuất trở
+về bộ nhớ khách của trình duyệt, không chuyển chat khách lên DB. Nếu trình
+duyệt còn cookie hợp lệ từ bản cũ, đăng nhập đúng mật khẩu sẽ giữ lại lịch sử
+cũ của trình duyệt đó trong không gian admin. Để trống mật khẩu khi chạy
+local sẽ tắt đăng nhập admin.
+
+Muốn bind ra mạng, đặt mật khẩu admin, khai báo `allowed_hosts` đúng host và
+dùng HTTPS qua reverse proxy (`secure_cookie = true`). Mặc định chỉ bind
+localhost. Cookie HttpOnly/SameSite và kiểm tra origin bảo vệ API admin;
+cookie khách chỉ dùng cho giới hạn lượt, không chứa lịch sử. Xóa `data/` sẽ
+làm mất lịch sử/ký ức admin local và khóa phiên, không xóa bộ nhớ khách.

@@ -190,3 +190,11 @@ class Store:
         async with self.db() as db:
             await db.execute("INSERT INTO runtime VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", (key, value))
             await db.commit()
+
+    async def merge_owner(self, previous: str, target: str):
+        """Claim a signed legacy browser's history after admin password login."""
+        async with self.db() as db:
+            await db.execute("BEGIN IMMEDIATE")
+            await db.execute("UPDATE sessions SET owner=? WHERE owner=?", (target, previous))
+            await db.execute("UPDATE memories SET owner=? WHERE owner=?", (target, previous))
+            await db.commit()

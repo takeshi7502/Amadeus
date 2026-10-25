@@ -7,10 +7,11 @@
   <meta name="description" content="Amadeus — trò chuyện với một bản mô phỏng Makise Kurisu từ Steins;Gate.">
   <title>Amadeus · Makise Kurisu</title>
   <link rel="icon" type="image/webp" href="/runtime/branding/logo.webp">
-  <link rel="stylesheet" href="/assets/style.css?v=20261026-chatfont1">
+  <link rel="stylesheet" href="/assets/style.css?v=20261026-public1">
   <script src="/assets/vendor/markdown-it.min.js?v=15.0.3" defer></script>
   <script src="/assets/markdown.js?v=20261026-markdown1" defer></script>
-  <script src="/assets/app.js?v=20261026-markdown1" defer></script>
+  <script src="/assets/guest-storage.js?v=20261026-public1" defer></script>
+  <script src="/assets/app.js?v=20261026-public1" defer></script>
   <script src="/assets/voice.js?v=20261025-animevoice2" defer></script>
   <script src="/assets/avatar.js?v=20261025-voice1" type="module"></script>
 </head>
@@ -25,7 +26,7 @@
       <button id="open-memory" class="nav-button"><span aria-hidden="true">◇</span> Ký ức riêng <span id="memory-count">0</span></button>
       <button id="open-canon" class="nav-button"><span aria-hidden="true">▤</span> Hồ sơ Steins;Gate <span aria-hidden="true">↗</span></button>
       <button id="open-about" class="nav-button"><span aria-hidden="true">ⓘ</span> Hệ thống & nguồn</button>
-      <div class="local-profile"><span class="profile-icon">U</span><div>Không gian của cậu<small>Lịch sử và ký ức cá nhân</small></div><span class="private-badge">RIÊNG</span></div>
+      <button id="account-button" class="local-profile" type="button" aria-haspopup="dialog" aria-controls="login-dialog" aria-label="Đăng nhập admin"><span id="profile-icon" class="profile-icon">U</span><span class="profile-details"><span id="profile-title">Đăng nhập admin</span><small id="profile-description">Lịch sử chỉ trên trình duyệt này</small></span><span id="profile-badge" class="private-badge">KHÁCH</span></button>
     </div>
   </aside>
 
@@ -95,7 +96,7 @@
   <form id="memory-form"><label for="memory-input">Thêm một ghi chú</label><textarea id="memory-input" maxlength="1000" required rows="3" placeholder="Ví dụ: Cứ gọi tôi là Takeshi. Tôi đang học Python."></textarea><button class="primary-button" type="submit">Lưu ký ức</button></form>
   <p id="memory-error" role="alert" class="dialog-error" hidden></p>
   <div id="memory-list" class="memory-list"></div>
-  <p class="privacy-note">Ghi chú được lưu trong database trên máy chủ dự án và gửi đến nhà cung cấp AI khi trả lời. Xóa ghi chú sẽ ngừng đưa nó vào prompt; nội dung đã có trong lịch sử cũ vẫn còn.</p>
+  <p id="memory-privacy" class="privacy-note">Ghi chú chỉ lưu trên trình duyệt này. Nội dung liên quan được gửi đến AI khi trò chuyện.</p>
 </dialog>
 
 <dialog id="canon-dialog" class="sheet-dialog canon-dialog">
@@ -106,8 +107,15 @@
 </dialog>
 
 <dialog id="login-dialog" class="sheet-dialog login-dialog">
-  <img class="login-logo" src="/runtime/branding/logo.webp" alt="Amadeus"><span class="tiny-label">PRIVATE CONNECTION</span><h2>Kết nối Amadeus.</h2><p>Nhập mật khẩu của phiên máy chủ này để bắt đầu.</p>
-  <form id="login-form"><label for="password">Mật khẩu</label><input id="password" type="password" autocomplete="current-password" required><p id="login-error" class="dialog-error" role="alert" hidden></p><button class="primary-button" type="submit">Kết nối →</button></form>
+  <div class="dialog-header"><div><span class="tiny-label">ADMIN / MEMORY ARCHIVE</span><h2>Đăng nhập admin.</h2></div><button class="icon-button close-dialog" type="button" aria-label="Đóng">×</button></div>
+  <p class="dialog-description">Nhập mật khẩu quản trị để mở lịch sử lưu trên máy chủ. Cậu vẫn có thể trò chuyện ở chế độ khách mà không đăng nhập.</p>
+  <form id="login-form"><label for="password">Mật khẩu admin</label><input id="password" type="password" autocomplete="current-password" required><p id="login-error" class="dialog-error" role="alert" hidden></p><button class="primary-button" type="submit">Đăng nhập →</button></form>
+</dialog>
+<dialog id="account-dialog" class="sheet-dialog account-dialog">
+  <div class="dialog-header"><div><span class="tiny-label">ADMIN / CONNECTED</span><h2>Không gian admin.</h2></div><button class="icon-button close-dialog" type="button" aria-label="Đóng">×</button></div>
+  <p class="dialog-description">Hội thoại và ghi chú của admin được lưu trên máy chủ. Đăng nhập cùng mật khẩu trên thiết bị khác để tiếp tục trò chuyện.</p>
+  <p class="privacy-note">Chat khách vẫn ở riêng trên trình duyệt này. Đăng xuất sẽ quay về lịch sử khách, không xóa hội thoại admin.</p>
+  <button id="admin-logout" class="primary-button" type="button">Đăng xuất về chế độ khách</button>
 </dialog>
 <dialog id="about-dialog" class="sheet-dialog">
   <div class="dialog-header"><div><span class="tiny-label">SYSTEM / ATTRIBUTION</span><h2>Amadeus — hệ thống & nguồn</h2></div><button class="icon-button close-dialog" aria-label="Đóng">×</button></div>
