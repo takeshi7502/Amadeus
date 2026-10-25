@@ -25,12 +25,23 @@
   let frame = 0;
   let context, analyser, samples;
 
-  // Preferences are local to this browser. Sound always starts with a click.
-  const storedVolume = localStorage.getItem('amadeus.voice.volume');
+  function preference(name) {
+    try { return localStorage.getItem('amadeus.voice.' + name); }
+    catch { return null; }
+  }
+  function savePreference(name, value) {
+    try { localStorage.setItem('amadeus.voice.' + name, value); }
+    catch { /* Keep in-page controls usable when browser storage is unavailable. */ }
+  }
+  let arrivalPending = preference('enabled') !== 'off';
+  let arrivalTried = false;
+
+  // Preferences are local to this browser; an explicit mute also applies on arrival.
+  const storedVolume = preference('volume');
   const savedVolume = storedVolume === null ? 65 : Number(storedVolume);
   volume.value = Number.isFinite(savedVolume) ? Math.max(0, Math.min(100, savedVolume)) : 65;
   audio.volume = Number(volume.value) / 100;
-  ambient.checked = localStorage.getItem('amadeus.voice.ambient') !== 'off';
+  ambient.checked = preference('ambient') !== 'off';
 
   function announce(speaking, level = 0) {
     document.dispatchEvent(new CustomEvent('amadeus:voice', {detail: {speaking, level}}));
@@ -40,6 +51,16 @@
   }
   function available() {
     return enabled && !busy && panelVisible() && !document.querySelector('dialog[open]');
+  }
+  function greetOnArrival(fromGesture = false) {
+    if (!arrivalPending || (arrivalTried && !fromGesture) || playing || busy || !panelVisible()
+      || document.querySelector('dialog[open]') || $('avatar-container').dataset.state !== 'ready'
+      || audio.volume <= 0 || !bank.some((line) => line.group === 'welcome')) return;
+    arrivalPending = false;
+    arrivalTried = true;
+    enabled = true;
+    controls();
+    playGroup('welcome', {arrival: true});
   }
   function controls() {
     toggle.setAttribute('aria-pressed', String(enabled));
@@ -97,6 +118,8 @@
   function prepareMeter() {
     try {
       if (!context) {
+        // A suspended audio graph can silence otherwise permitted HTML autoplay.
+        if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return;
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         if (!AudioContext) return;
         context = new AudioContext();
@@ -110,7 +133,7 @@
       context.resume().catch(() => {});
     } catch { /* HTML audio still works without a meter. */ }
   }
-  function playGroup(group) {
+  function playGroup(group, {arrival = false} = {}) {
     if (!available()) return;
     const options = bank.filter((line) => line.group === group);
     const fresh = options.filter((line) => line.id !== lastLine);
@@ -131,16 +154,19 @@
       bubbleTimer = setTimeout(() => { bubble.hidden = true; }, 2400);
       scheduleIdle();
     };
-    const failed = () => {
+    const failed = (error) => {
       if (token !== sequence) return;
       stop();
       enabled = false;
       controls();
       clearTimeout(idleTimer);
-      ui.bind(status, 'Chưa phát được âm thanh. Bấm bật giọng để thử lại.');
+      if (arrival && error?.name === 'NotAllowedError') {
+        arrivalPending = true;
+        ui.bind(status, 'Chạm vào trang để nghe lời chào của Kurisu.');
+      } else ui.bind(status, 'Chưa phát được âm thanh. Bấm bật giọng để thử lại.');
     };
     audio.onerror = failed;
-    // Start from the click's user activation; don't await any network request.
+    // Play immediately so a gesture retry retains the browser's user activation.
     audio.play().then(() => {
       if (token !== sequence) return;
       playing = true;
@@ -167,28 +193,34 @@
     return 'reply';
   }
   toggle.addEventListener('click', () => {
+    arrivalPending = false;
     enabled = !enabled;
+    savePreference('enabled', enabled ? 'on' : 'off');
     controls();
     lastInteraction = Date.now();
     if (enabled) playGroup('welcome');
     else { stop(); clearTimeout(idleTimer); ui.bind(status, 'Âm thanh đang tắt'); }
   });
   preview.addEventListener('click', () => {
+    arrivalPending = false;
+    savePreference('enabled', 'on');
     enabled = true; controls(); lastInteraction = Date.now(); playGroup('idle');
   });
-  $('voice-stop').addEventListener('click', () => { stop(); scheduleIdle(); });
+  $('voice-stop').addEventListener('click', () => { arrivalPending = false; stop(); scheduleIdle(); });
   volume.addEventListener('input', () => {
     audio.volume = Number(volume.value) / 100;
-    localStorage.setItem('amadeus.voice.volume', volume.value);
+    savePreference('volume', volume.value);
   });
   ambient.addEventListener('change', () => {
-    localStorage.setItem('amadeus.voice.ambient', ambient.checked ? 'on' : 'off');
+    savePreference('ambient', ambient.checked ? 'on' : 'off');
     scheduleIdle();
   });
   selector.addEventListener('change', () => {
     const profile = profiles.find((item) => item.id === selector.value);
     if (!profile) return;
-    localStorage.setItem('amadeus.voice.profile', profile.id);
+    arrivalPending = false;
+    savePreference('enabled', 'on');
+    savePreference('profile', profile.id);
     selectProfile(profile);
     enabled = true;
     controls();
@@ -197,7 +229,7 @@
   });
   document.addEventListener('amadeus:state', (event) => {
     busy = event.detail !== 'idle';
-    if (busy) stop();
+    if (busy) { arrivalPending = false; stop(); }
     preview.disabled = busy || !bank.length;
     selector.disabled = busy || !profiles.length;
     scheduleIdle();
@@ -206,21 +238,33 @@
     lastInteraction = Date.now();
     if (available()) playGroup(reaction(event.detail.userText));
   });
-  document.addEventListener('amadeus:navigate', () => { stop(); lastInteraction = Date.now(); scheduleIdle(); });
+  document.addEventListener('amadeus:navigate', () => { arrivalPending = false; stop(); lastInteraction = Date.now(); scheduleIdle(); });
   document.addEventListener('visibilitychange', () => {
     stop(); clearTimeout(idleTimer);
-    if (!document.hidden) { lastInteraction = Date.now(); scheduleIdle(); }
+    if (!document.hidden) { lastInteraction = Date.now(); greetOnArrival(); scheduleIdle(); }
   });
   for (const event of ['pointerdown', 'keydown', 'input']) {
     document.addEventListener(event, () => { lastInteraction = Date.now(); }, {passive: true});
   }
-  const observer = new MutationObserver(() => { if (!panelVisible() || document.querySelector('dialog[open]')) stop(); });
+  for (const type of ['click', 'keydown']) {
+    document.addEventListener(type, (event) => {
+      if ((!event.isTrusted && !navigator.userActivation?.isActive) || event.repeat
+        || event.ctrlKey || event.metaKey || event.altKey || event.key === 'Escape'
+        || event.target.closest?.('#voice-toggle, #voice-preview, #voice-profile, #voice-stop')) return;
+      greetOnArrival(true);
+    });
+  }
+  const observer = new MutationObserver(() => {
+    if (!panelVisible() || document.querySelector('dialog[open]')) stop();
+    else greetOnArrival();
+  });
   observer.observe($('character-panel'), {attributes: true, attributeFilter: ['inert', 'class']});
+  observer.observe($('avatar-container'), {attributes: true, attributeFilter: ['data-state']});
   document.querySelectorAll('dialog').forEach((dialog) => observer.observe(dialog, {attributes: true, attributeFilter: ['open']}));
   $('kurisu-canvas').addEventListener('click', () => {
     if (enabled && !playing && Date.now() - lastInteraction < 1000) playGroup('touch');
   });
-  window.addEventListener('pagehide', () => { stop(); clearTimeout(idleTimer); });
+  window.addEventListener('pagehide', () => { arrivalPending = false; stop(); clearTimeout(idleTimer); });
   controls();
   fetch('/runtime/voice/bank.json').then((response) => {
     if (!response.ok) throw new Error('missing voice bank');
@@ -237,7 +281,7 @@
         const option = document.createElement('option');
         option.value = profile.id; ui.bind(option, profile.label); selector.append(option);
       }
-      const remembered = localStorage.getItem('amadeus.voice.profile');
+      const remembered = preference('profile');
       const selected = profiles.find((profile) => profile.id === remembered)
         || profiles.find((profile) => profile.id === manifest.default_profile) || profiles[0];
       selectProfile(selected);
@@ -250,6 +294,8 @@
     }
     if (!bank.length) throw new Error('empty voice bank');
     toggle.disabled = false; preview.disabled = busy;
+    if (preference('enabled') === 'off') ui.bind(status, 'Âm thanh đang tắt');
+    greetOnArrival();
   }).catch(() => {
     ui.bind(status, 'Chưa có bộ giọng. Xem Hệ thống & nguồn.');
   });
