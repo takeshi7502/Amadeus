@@ -1,0 +1,15 @@
+services:
+  amadeus:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8017:8017"
+    environment:
+      AMADEUS_WEB_PASSWORD: ${AMADEUS_WEB_PASSWORD:?Set AMADEUS_WEB_PASSWORD before starting Docker}
+      AMADEUS_ASSETS_DIR: /app/runtime_assets
+    volumes:
+      - ./settings.toml:/app/settings.toml:ro
+      - amadeus-data:/app/data
+      - ./runtime_assets:/app/runtime_assets:ro
+volumes:
+  amadeus-data:

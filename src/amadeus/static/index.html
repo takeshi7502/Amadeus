@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c0e10">
+  <meta name="description" content="Amadeus — trò chuyện với một bản mô phỏng Makise Kurisu từ Steins;Gate.">
+  <title>Amadeus · Makise Kurisu</title>
+  <link rel="icon" type="image/webp" href="/runtime/branding/logo.webp">
+  <link rel="stylesheet" href="/assets/style.css?v=20261025-sessions5">
+  <script src="/assets/app.js?v=20261025-sessions5" defer></script>
+  <script src="/assets/avatar.js" type="module"></script>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar" aria-label="Danh sách hội thoại">
+    <a class="brand" href="/" aria-label="Amadeus — trang chính"><img src="/runtime/branding/logo.webp" alt="Logo Amadeus theo thiết kế Steins;Gate 0"><span>VIKTOR CHONDRIA UNIVERSITY<small>ARTIFICIAL INTELLIGENCE SYSTEM</small></span></a>
+    <button class="new-chat" id="new-chat"><svg aria-hidden="true"><use href="/assets/icons.svg#plus"/></svg> Cuộc trò chuyện mới <kbd>N</kbd></button>
+    <div class="section-label">LỊCH SỬ <span id="session-count">00</span></div>
+    <div id="sessions" class="sessions"><p class="empty-note">Chưa có cuộc trò chuyện nào.</p></div>
+    <div class="sidebar-bottom">
+      <button id="open-memory" class="nav-button"><span aria-hidden="true">◇</span> Ký ức riêng <span id="memory-count">0</span></button>
+      <button id="open-canon" class="nav-button"><span aria-hidden="true">▤</span> Hồ sơ Steins;Gate <span aria-hidden="true">↗</span></button>
+      <button id="open-about" class="nav-button"><span aria-hidden="true">ⓘ</span> Hệ thống & nguồn</button>
+      <div class="local-profile"><span class="profile-icon">U</span><div>Không gian của cậu<small>Lịch sử và ký ức cá nhân</small></div><span class="private-badge">RIÊNG</span></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="chat-header">
+      <button id="menu" class="icon-button mobile-only" aria-label="Mở lịch sử" aria-expanded="false"><svg aria-hidden="true"><use href="/assets/icons.svg#menu"/></svg></button>
+      <div class="header-title"><span class="tiny-label">AMADEUS // MEMORY INTERFACE</span><h1>Kết nối với Kurisu <span class="header-dot">/</span> <span>牧瀬 紅莉栖</span></h1></div>
+      <div class="header-actions">
+        <select id="mode" aria-label="Chế độ Amadeus" title="Chuyển về hội thoại gần nhất của chế độ này">
+          <option value="amadeus">Amadeus · bản ký ức</option>
+          <option value="lab">Amadeus · dữ liệu lab Alpha</option>
+        </select>
+        <button id="show-avatar" class="icon-button avatar-toggle" aria-label="Hiện Kurisu" aria-expanded="false" title="Hiện Kurisu"><svg aria-hidden="true"><use href="/assets/icons.svg#person"/></svg></button>
+        <button id="export" class="icon-button" aria-label="Tải hội thoại JSON" title="Tải hội thoại JSON"><svg aria-hidden="true"><use href="/assets/icons.svg#download"/></svg></button>
+        <button id="delete-chat" class="icon-button" aria-label="Xóa cuộc hội thoại" title="Xóa cuộc hội thoại"><svg aria-hidden="true"><use href="/assets/icons.svg#trash"/></svg></button>
+      </div>
+    </header>
+    <div id="setup-banner" class="setup-banner" hidden>Chưa kết nối model. Điền thông tin AI trong <code>settings.toml</code> rồi khởi động lại máy chủ.</div>
+
+    <div class="conversation" id="conversation" tabindex="0" aria-label="Nội dung cuộc trò chuyện">
+      <section class="welcome" id="welcome">
+        <div class="welcome-mark"><span class="welcome-indicator"></span><span>MEMORY ARCHIVE / CHANNEL 004</span><span class="welcome-line"></span></div>
+        <div class="welcome-overline">MAKISE KURISU <span>牧瀬 紅莉栖</span></div>
+        <h2>Ký ức không chỉ<br>là những dữ liệu.</h2>
+        <p>“Cậu đang nghĩ gì vậy?<br>Nói ra thử xem. Chúng ta có thể bắt đầu từ đó.”</p>
+        <div class="suggestions">
+          <button data-prompt="Hôm nay tôi hơi mệt. Nói chuyện với tôi một chút nhé?"><span>01 / ĐỜI THƯỜNG</span>Hôm nay tôi hơi mệt.<b aria-hidden="true">↗</b></button>
+          <button data-prompt="Kurisu, ký ức có đủ để định nghĩa một con người không?"><span>02 / MỘT CÂU HỎI</span>Ký ức có làm nên con người?<b aria-hidden="true">↗</b></button>
+          <button data-prompt="Giải thích sự khác nhau giữa D-mail và time leap trong Steins;Gate đi."><span>03 / PHÒNG THÍ NGHIỆM</span>D-mail và time leap khác gì?<b aria-hidden="true">↗</b></button>
+          <button data-prompt="Tôi đang học một điều mới nhưng hơi nản. Giúp tôi tìm cách học tốt hơn được không?"><span>04 / CÙNG SUY NGHĨ</span>Cùng giải quyết một vấn đề.<b aria-hidden="true">↗</b></button>
+        </div>
+      </section>
+      <div id="messages" class="messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+    </div>
+
+    <div class="composer-region">
+      <div id="error" class="error-notice" role="alert" hidden><span id="error-text"></span><button id="retry">Thử lại</button><button id="dismiss-error" aria-label="Ẩn thông báo">×</button></div>
+      <div class="composer-context"><div class="mode-hint"><span class="context-dot"></span><span id="mode-description">Amadeus · bản ký ức trước chuyến về Nhật</span></div><label class="search-toggle"><input type="checkbox" id="web-search"><svg aria-hidden="true"><use href="/assets/icons.svg#search"/></svg><span>Tra cứu mạng</span></label></div>
+      <form id="chat-form" class="composer">
+        <label class="sr-only" for="input">Tin nhắn cho Kurisu</label>
+        <textarea id="input" rows="1" maxlength="6000" placeholder="Nói với Kurisu điều gì đó…"></textarea>
+        <button id="send" type="submit" aria-label="Gửi tin nhắn" title="Gửi tin nhắn"><svg aria-hidden="true"><use href="/assets/icons.svg#send"/></svg></button>
+        <button id="stop" type="button" aria-label="Dừng trả lời" title="Dừng trả lời" hidden>■</button>
+      </form>
+      <div class="composer-footer"><span>Enter để gửi <span class="faded">/</span> Shift + Enter xuống dòng</span><span>Chế độ nhập vai <span class="faded">/</span> Spoiler S;G & S;G 0</span></div>
+    </div>
+  </main>
+
+  <aside class="character-panel" id="character-panel" aria-label="Kết nối hình ảnh với Kurisu">
+    <div class="connection"><span id="connection-dot"></span><span id="connection-text">ĐANG KẾT NỐI</span><span class="signal" aria-hidden="true">▂▄▆</span><button id="close-avatar" class="icon-button avatar-toggle" aria-label="Đóng khung nhân vật">×</button></div>
+    <div class="avatar-stage" id="avatar-container" data-state="loading"><div class="portrait-grid"></div><div class="stage-corner top-left"></div><div class="stage-corner bottom-right"></div><span class="portrait-coordinate">AMADEUS<br>VISUAL CONNECTION</span><canvas id="kurisu-canvas" aria-label="Model Live2D của Makise Kurisu" role="img" hidden></canvas><div id="avatar-fallback"><img src="/runtime/branding/logo.webp" alt="Amadeus"><p>Đang khởi tạo kết nối hình ảnh…</p></div><div class="portrait-caption"><span id="avatar-status">INITIALIZING LIVE2D</span><span>004</span></div></div>
+    <div class="character-info"><div class="section-label">MEMORY SUBJECT / 004</div><h2>MAKISE <em>KURISU</em></h2><span class="japanese-name">牧瀬 紅莉栖</span><div class="character-tags"><span>Neuroscience</span><span>Amadeus AI</span></div><p>“Cứ nói đi. Tôi đang nghe.”</p></div>
+    <div class="archive-card"><span class="archive-icon">⌘</span><div><strong>MEMORY. PERSONALITY. PRESENCE.</strong><p>Một bản ký ức.<br>Một cuộc trò chuyện đang tiếp diễn.</p></div></div>
+    <div class="panel-footer"><span>LIVE2D: DSUV / ELVELT</span><span>FAN / NON-COMMERCIAL</span></div>
+  </aside>
+</div>
+
+<dialog id="memory-dialog" class="sheet-dialog">
+  <div class="dialog-header"><div><span class="tiny-label">PERSONAL MEMORY</span><h2>Những điều cần nhớ.</h2></div><button class="icon-button close-dialog" aria-label="Đóng">×</button></div>
+  <p class="dialog-description">Ghi chú cậu chủ động lưu sẽ được đưa vào các cuộc trò chuyện tiếp theo. Chúng tách riêng với ký ức nhân vật trong nguyên tác.</p>
+  <form id="memory-form"><label for="memory-input">Thêm một ghi chú</label><textarea id="memory-input" maxlength="1000" required rows="3" placeholder="Ví dụ: Cứ gọi tôi là Takeshi. Tôi đang học Python."></textarea><button class="primary-button" type="submit">Lưu ký ức</button></form>
+  <p id="memory-error" role="alert" class="dialog-error" hidden></p>
+  <div id="memory-list" class="memory-list"></div>
+  <p class="privacy-note">Ghi chú được lưu trong database trên máy chủ dự án và gửi đến nhà cung cấp AI khi trả lời. Xóa ghi chú sẽ ngừng đưa nó vào prompt; nội dung đã có trong lịch sử cũ vẫn còn.</p>
+</dialog>
+
+<dialog id="canon-dialog" class="sheet-dialog canon-dialog">
+  <div class="dialog-header"><div><span class="tiny-label">CANON REFERENCE / SPOILERS</span><h2>Hồ sơ Steins;Gate.</h2></div><button class="icon-button close-dialog" aria-label="Đóng">×</button></div>
+  <p class="dialog-description">Ghi chú tóm tắt có nguồn, phân biệt world line và phiên bản. Đây là dữ liệu tham chiếu, không phải toàn bộ kịch bản hay toàn bộ ký ức trực tiếp của Amadeus.</p>
+  <label class="sr-only" for="canon-search">Tìm trong hồ sơ</label><input id="canon-search" type="search" placeholder="Tìm nhân vật, Amadeus, D-mail, world line…" maxlength="300">
+  <div id="canon-list" class="canon-list"></div>
+</dialog>
+
+<dialog id="login-dialog" class="sheet-dialog login-dialog">
+  <img class="login-logo" src="/runtime/branding/logo.webp" alt="Amadeus"><span class="tiny-label">PRIVATE CONNECTION</span><h2>Kết nối Amadeus.</h2><p>Nhập mật khẩu của phiên máy chủ này để bắt đầu.</p>
+  <form id="login-form"><label for="password">Mật khẩu</label><input id="password" type="password" autocomplete="current-password" required><p id="login-error" class="dialog-error" role="alert" hidden></p><button class="primary-button" type="submit">Kết nối →</button></form>
+</dialog>
+<dialog id="about-dialog" class="sheet-dialog">
+  <div class="dialog-header"><div><span class="tiny-label">SYSTEM / ATTRIBUTION</span><h2>Amadeus — hệ thống & nguồn</h2></div><button class="icon-button close-dialog" aria-label="Đóng">×</button></div>
+  <p class="dialog-description">Đây là giao diện trò chuyện nhập vai bằng AI. Kurisu duy trì điểm nhìn của Amadeus trong thế giới Steins;Gate; thông tin kỹ thuật của ứng dụng được trình bày ở đây, tách khỏi lời nhân vật.</p>
+  <p class="dialog-description">Model Live2D và logo: <a href="https://github.com/dsuv-sg/RealAmadeus" target="_blank" rel="noopener noreferrer">DSUV / ELVELT — RealAmadeus</a>. Bản tài nguyên tối ưu cho web: <a href="https://github.com/JulienQ1/AmadeusMobile" target="_blank" rel="noopener noreferrer">JulienQ1</a>. <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener noreferrer">CC BY-NC 4.0</a>, phi thương mại; không phải tài nguyên chính thức được MAGES. chứng thực.</p>
+  <p class="dialog-description">Live2D Cubism © Live2D Inc.; Be Vietnam Pro và Barlow Condensed theo SIL Open Font License. Steins;Gate / nhân vật © các chủ sở hữu tương ứng. Mã ứng dụng theo AGPL v3; các tài nguyên trên giữ giấy phép riêng.</p>
+</dialog>
+<div id="toast" role="status" hidden></div>
+</body>
+</html>

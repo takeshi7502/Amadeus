@@ -1,0 +1,62 @@
+{
+  "branding/logo.webp": {
+    "url": "https://raw.githubusercontent.com/JulienQ1/AmadeusMobile/eb95bd52fcac76d90109c2f3c4bd2c915be09d98/web/public/img/logo.webp",
+    "sha256": "fa8a39ee35aa787dad7d8524eda100b418095da63fb1bee980a301eafa4ba7e9"
+  },
+  "licenses/amadeus-model.txt": {
+    "url": "https://raw.githubusercontent.com/JulienQ1/AmadeusMobile/eb95bd52fcac76d90109c2f3c4bd2c915be09d98/LICENSE",
+    "sha256": "5c78eb77481e5c38a774eb038b93220936264a9780b851f59ed5fa4afb0d437d"
+  },
+  "kurisu/kurisu.model3.json": {
+    "url": "https://raw.githubusercontent.com/JulienQ1/AmadeusMobile/eb95bd52fcac76d90109c2f3c4bd2c915be09d98/web/public/model/kurisu/kurisu.model3.json",
+    "sha256": "a992409f25ba5e885fe1332e2128da0b92ed74afc094a135eec1847af9a21803"
+  },
+  "kurisu/kurisu.moc3": {
+    "url": "https://raw.githubusercontent.com/JulienQ1/AmadeusMobile/eb95bd52fcac76d90109c2f3c4bd2c915be09d98/web/public/model/kurisu/kurisu.moc3",
+    "sha256": "774b5e5916671de0380d3c047485a78bb494bd1601e188858184979005e0c81a"
+  },
+  "kurisu/kurisu.physics3.json": {
+    "url": "https://raw.githubusercontent.com/JulienQ1/AmadeusMobile/eb95bd52fcac76d90109c2f3c4bd2c915be09d98/web/public/model/kurisu/kurisu.physics3.json",
+    "sha256": "b987e7fc046d8a45d58a7dd6edbf053fb7b9a484e1070ed176c086b8fda9371f"
+  },
+  "kurisu/kurisu.cdi3.json": {
+    "url": "https://raw.githubusercontent.com/JulienQ1/AmadeusMobile/eb95bd52fcac76d90109c2f3c4bd2c915be09d98/web/public/model/kurisu/kurisu.cdi3.json",
+    "sha256": "2d19dd235fb8cb26d1b582f9b6f0cb8aa33f61ebe0a7ec0d14d0f27bb25a93b9"
+  },
+  "kurisu/texture_4096.png": {
+    "url": "https://raw.githubusercontent.com/JulienQ1/AmadeusMobile/eb95bd52fcac76d90109c2f3c4bd2c915be09d98/web/public/model/kurisu/texture_4096.png",
+    "sha256": "0c796eb3b365ad123699412222e938873aaa992b5049c0883a19fce86c3707c0"
+  },
+  "fonts/BeVietnamPro-Regular.ttf": {
+    "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/bevietnampro/BeVietnamPro-Regular.ttf",
+    "sha256": "cd1ef6e9d7db28ad5cdb88a65ccbe693870e60d340b791f349d248342b4fe4c3"
+  },
+  "fonts/BeVietnamPro-Medium.ttf": {
+    "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/bevietnampro/BeVietnamPro-Medium.ttf",
+    "sha256": "b60832bfa0fcd015158112c64d7e3fdad3b0c6287d1823f85a3103636e845268"
+  },
+  "fonts/BarlowCondensed-Medium.ttf": {
+    "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/barlowcondensed/BarlowCondensed-Medium.ttf",
+    "sha256": "262bd143292ce479ee0cd09a42b47ab173fca8e9c6eb5ed0b5c8a845bc371d17"
+  },
+  "licenses/be-vietnam-pro.txt": {
+    "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/bevietnampro/OFL.txt",
+    "sha256": "6b7f8f73609a25ea78c891e34cf37b06f8a676b7ea986e941e43b009110f2a85"
+  },
+  "licenses/barlow-condensed.txt": {
+    "url": "https://raw.githubusercontent.com/google/fonts/main/ofl/barlowcondensed/OFL.txt",
+    "sha256": "186d750eb496a4c17a76385f82be6aea2ac1cf2de074a811d63786cf374ea73f"
+  },
+  "vendor/live2dcubismcore.min.js": {
+    "url": "https://raw.githubusercontent.com/Open-LLM-VTuber/Open-LLM-VTuber-Web/d176e7df2366952e3bacbf12cf9a8b18a4315932/src/renderer/WebSDK/Core/live2dcubismcore.min.js",
+    "sha256": "942783587666a3a1bddea93afd349e26f798ed19dcd7a52449d0ae3322fcff7c"
+  },
+  "licenses/cubism-core.md": {
+    "url": "https://raw.githubusercontent.com/Open-LLM-VTuber/Open-LLM-VTuber-Web/d176e7df2366952e3bacbf12cf9a8b18a4315932/src/renderer/WebSDK/Core/LICENSE.md",
+    "sha256": "b81e37048010ef1d336106151201a0323c3309cae44aecdedf57831fe88fa991"
+  },
+  "licenses/cubism-framework.md": {
+    "url": "https://raw.githubusercontent.com/Live2D/CubismWebFramework/01e64ba44fc29e5e7206f0c397ee532edf824ee9/LICENSE.md",
+    "sha256": "7ed849bff1e6499aa7cd882e47d246ddbbe06817c1e84cb974df949488302614"
+  }
+}

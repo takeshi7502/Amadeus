@@ -1,0 +1,14 @@
+.git
+.venv
+data
+settings.toml
+.env*
+__pycache__
+.pytest_cache
+tests
+logs
+.local
+.cache
+node_modules
+dist
+runtime_assets

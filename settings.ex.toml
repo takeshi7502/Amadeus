@@ -1,0 +1,33 @@
+# Sao chép thành settings.toml. File riêng và data/ được Git bỏ qua.
+agent_chat_model = "default/your-model-name"
+host = "127.0.0.1"
+port = 8017
+default_mode = "amadeus"
+model_timeout = 90
+max_output_tokens = 1400
+temperature = 0.75
+send_temperature = true # Đặt false nếu model không hỗ trợ temperature.
+history_chars = 24000
+assets_dir = "runtime_assets" # Model/font tải riêng bằng tools/prepare_assets.py
+web_search_enabled = true # Web: bật Tra cứu mạng; Telegram: /search <câu hỏi>
+# Đặt mật khẩu trước khi public ra Internet. Có thể dùng AMADEUS_WEB_PASSWORD.
+web_password = ""
+# Bật khi dùng HTTPS qua reverse proxy.
+secure_cookie = false
+allowed_hosts = ["127.0.0.1", "localhost", "testserver"]
+
+# Bot Telegram mới, KHÔNG dùng token của bot waku đang chạy.
+telegram_enabled = false
+telegram_token = ""
+# Rỗng: cho phép mọi người DM bot. Điền ID để chỉ cho phép những người này.
+telegram_allowed_users = []
+
+# Schema provider/model kế thừa waku-bot. Tên model có thể chứa dấu /.
+[agent_providers.default]
+url = "https://api.openai.com/v1"
+key = ""
+type = "chat_completions"
+# api_type = "ollama" # url có thể là http://localhost:11434
+
+# Dùng type = "responses" cho nhà cung cấp hỗ trợ Responses.
+# api_key_env = "MY_AI_KEY" # Ưu tiên key trong biến môi trường nếu khai báo.

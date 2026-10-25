@@ -1,0 +1,7 @@
+{
+  "name": "amadeus-assets",
+  "private": true,
+  "type": "module",
+  "scripts": {"assets": "python tools/prepare_assets.py"},
+  "devDependencies": {"esbuild": "0.25.12"}
+}
