@@ -10,7 +10,7 @@ from contextlib import aclosing, asynccontextmanager
 
 from .config import Settings
 from .knowledge import KnowledgeBase
-from .persona import IDENTITY_ANCHOR, build_prompt
+from .persona import IDENTITY_ANCHOR, REPLY_LANGUAGES, build_prompt
 from .provider import ModelClient, ModelError
 from .search import search_web
 from .storage import Store
@@ -81,7 +81,8 @@ class ChatService:
             raise ChatError("Không tìm thấy cuộc hội thoại.", 404)
         return session
 
-    async def events(self, owner: str, sid: str, text: str, rid: str, *, web_search: bool = False) -> AsyncIterator[tuple[str, dict]]:
+    async def events(self, owner: str, sid: str, text: str, rid: str, *, web_search: bool = False,
+                     language: str | None = None) -> AsyncIterator[tuple[str, dict]]:
         text = text.strip()
         if not text or len(text) > 6000:
             raise ChatError("Tin nhắn cần từ 1 đến 6000 ký tự.")
@@ -97,14 +98,15 @@ class ChatService:
             await self.check_rate(owner)
             history = bounded_history(await self.store.messages(sid, limit=24), self.settings.history_chars)
             memories = await self.store.memories(owner)
-            async with aclosing(self.generate(session["mode"], text, rid, history, memories, web_search=web_search)) as events:
+            async with aclosing(self.generate(session["mode"], text, rid, history, memories,
+                                             web_search=web_search, language=language)) as events:
                 async for kind, payload in events:
                     if kind == "done":
                         await self.store.commit_turn(sid, rid, text, payload)
                     yield kind, payload
 
     async def guest_events(self, visitor: str, address: str, mode: str, text: str, rid: str,
-                           history: list[dict], memories: list[dict], *, web_search: bool = False):
+                           history: list[dict], memories: list[dict], *, web_search: bool = False, language: str | None = None):
         # Guest content is transient input only: no sessions, turns, locks or
         # rate-limit records are created in the persistent store.
         await self.check_rate("guest:" + visitor, persistent=False)
@@ -116,11 +118,12 @@ class ChatService:
                 continue
             notes.insert(0, note)
             budget -= len(note["content"])
-        async with aclosing(self.generate(mode, text, rid, history, notes, web_search=web_search)) as events:
+        async with aclosing(self.generate(mode, text, rid, history, notes, web_search=web_search, language=language)) as events:
             async for event in events:
                 yield event
 
-    async def generate(self, mode: str, text: str, rid: str, history: list[dict], memories: list[dict], *, web_search: bool):
+    async def generate(self, mode: str, text: str, rid: str, history: list[dict], memories: list[dict], *, web_search: bool,
+                       language: str | None = None):
         if not self.model.ready:
             raise ChatError("Chưa kết nối AI. Điền provider và model trong settings.toml rồi khởi động lại.", 503)
         query = " ".join(m["content"] for m in history[-2:] if m["role"] == "user") + " " + text
@@ -141,8 +144,13 @@ class ChatService:
                 except Exception:
                     search_note = "Kết nối tra cứu thất bại. Không nói đã xác minh hoặc bịa kết quả; nói ngắn gọn nếu thiếu dữ kiện mới."
         # Reinforce the current identity after legacy answers, which may contain old metadata.
+        # Apply the selected web language after history and source data so the
+        # persona's Vietnamese default cannot override the current UI choice.
+        anchor = IDENTITY_ANCHOR + "\n" + search_note
+        if language in REPLY_LANGUAGES:
+            anchor += "\n\n" + REPLY_LANGUAGES[language]
         messages = [{"role": "system", "content": system}, *history,
-                    {"role": "system", "content": IDENTITY_ANCHOR + "\n" + search_note},
+                    {"role": "system", "content": anchor},
                     {"role": "user", "content": text}]
         yield "context", {"knowledge": [{"id": e["id"], "title": e["title"]} for e in entries], "mode": mode}
         try:

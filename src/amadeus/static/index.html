@@ -7,13 +7,14 @@
   <meta name="description" content="Amadeus — trò chuyện với một bản mô phỏng Makise Kurisu từ Steins;Gate.">
   <title>Amadeus · Makise Kurisu</title>
   <link rel="icon" type="image/webp" href="/runtime/branding/logo.webp">
-  <link rel="stylesheet" href="/assets/style.css?v=20261026-public1">
+  <link rel="stylesheet" href="/assets/style.css?v=20261026-language2">
+  <script src="/assets/i18n.js?v=20261026-i18n1" defer></script>
   <script src="/assets/vendor/markdown-it.min.js?v=15.0.3" defer></script>
   <script src="/assets/markdown.js?v=20261026-markdown1" defer></script>
   <script src="/assets/guest-storage.js?v=20261026-public1" defer></script>
-  <script src="/assets/app.js?v=20261026-public1" defer></script>
-  <script src="/assets/voice.js?v=20261025-animevoice2" defer></script>
-  <script src="/assets/avatar.js?v=20261025-voice1" type="module"></script>
+  <script src="/assets/app.js?v=20261026-language2" defer></script>
+  <script src="/assets/voice.js?v=20261026-i18n1" defer></script>
+  <script src="/assets/avatar.js?v=20261026-i18n1" type="module"></script>
 </head>
 <body>
 <div class="app-shell">
@@ -26,7 +27,7 @@
       <button id="open-memory" class="nav-button"><span aria-hidden="true">◇</span> Ký ức riêng <span id="memory-count">0</span></button>
       <button id="open-canon" class="nav-button"><span aria-hidden="true">▤</span> Hồ sơ Steins;Gate <span aria-hidden="true">↗</span></button>
       <button id="open-about" class="nav-button"><span aria-hidden="true">ⓘ</span> Hệ thống & nguồn</button>
-      <button id="account-button" class="local-profile" type="button" aria-haspopup="dialog" aria-controls="login-dialog" aria-label="Hệ thống"><span id="profile-icon" class="profile-icon">U</span><span class="profile-details"><span id="profile-title">Hệ thống</span><small id="profile-description">Lịch sử chỉ trên trình duyệt này</small></span><span id="profile-badge" class="private-badge">KHÁCH</span></button>
+      <button id="account-button" class="local-profile" type="button" aria-haspopup="dialog" aria-controls="login-dialog" aria-label="Hệ thống"><span id="profile-icon" class="profile-icon" aria-hidden="true"><img src="/assets/kurisu-account.jpg" alt="" width="54" height="54"></span><span class="profile-details"><span id="profile-title">Hệ thống</span><small id="profile-description">Lịch sử chỉ trên trình duyệt</small></span><span id="profile-badge" class="private-badge">KHÁCH</span></button>
     </div>
   </aside>
 
@@ -35,6 +36,7 @@
       <button id="menu" class="icon-button mobile-only" aria-label="Mở lịch sử" aria-expanded="false"><svg aria-hidden="true"><use href="/assets/icons.svg#menu"/></svg></button>
       <div class="header-title"><span class="tiny-label">AMADEUS // MEMORY INTERFACE</span><h1>Kết nối với Kurisu <span class="header-dot">/</span> <span>牧瀬 紅莉栖</span></h1></div>
       <div class="header-actions">
+        <button id="language-toggle" class="language-toggle" type="button" lang="en" aria-label="Switch to English" title="Switch to English">EN</button>
         <select id="mode" aria-label="Chế độ Amadeus" title="Chuyển về hội thoại gần nhất của chế độ này">
           <option value="amadeus">Amadeus · bản ký ức</option>
           <option value="lab">Amadeus · dữ liệu lab Alpha</option>

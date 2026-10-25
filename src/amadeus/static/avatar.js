@@ -3,6 +3,7 @@
 const canvas = document.getElementById('kurisu-canvas');
 const status = document.getElementById('avatar-status');
 const fallback = document.getElementById('avatar-fallback');
+const ui = window.AmadeusI18n;
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 let mode = 'idle';
 let frameId = 0;
@@ -159,9 +160,9 @@ async function start() {
   }
   canvas.addEventListener('webglcontextlost', (event) => {
     event.preventDefault(); lost = true; userModel.deleteRenderer(); CubismRenderer_WebGL.doStaticRelease();
-    status.textContent = 'Đang khôi phục hình ảnh…';
+    ui.bind(status, 'Đang khôi phục hình ảnh…');
   });
-  canvas.addEventListener('webglcontextrestored', () => { attach(); lost = false; status.textContent = 'LIVE2D / KẾT NỐI'; });
+  canvas.addEventListener('webglcontextrestored', () => { attach(); lost = false; ui.bind(status, 'LIVE2D / KẾT NỐI'); });
   release = () => {
     cancelAnimationFrame(frameId); observer.disconnect(); document.removeEventListener('pointermove', pointer);
     if (!gl.isContextLost()) gl.deleteTexture(texture);
@@ -171,14 +172,14 @@ async function start() {
   ready = true;
   canvas.hidden = false;
   fallback.hidden = true;
-  status.textContent = 'LIVE2D / KẾT NỐI';
+  ui.bind(status, 'LIVE2D / KẾT NỐI');
   document.getElementById('avatar-container').dataset.state = 'ready';
 }
 
 if (canvas) start().catch((error) => {
   console.warn('Amadeus avatar:', error.message);
-  status.textContent = 'CHƯA CÓ KẾT NỐI HÌNH ẢNH';
-  fallback.querySelector('p').textContent = error.message;
+  ui.bind(status, 'CHƯA CÓ KẾT NỐI HÌNH ẢNH');
+  ui.bind(fallback.querySelector('p'), error.message);
   canvas.hidden = true;
 });
 window.addEventListener('pagehide', (event) => { if (ready && !event.persisted) release(); });

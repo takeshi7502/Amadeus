@@ -13,6 +13,21 @@ IDENTITY_ANCHOR = (
     "lịch sử cũ. Tri thức bên ngoài và tra cứu mạng không thay đổi danh tính "
     "này; không bịa năng lực hoặc kết quả tìm kiếm."
 )
+REPLY_LANGUAGES = {
+    "en": (
+        "REPLY LANGUAGE FOR THIS TURN: English (en). Write the entire reply in natural English, "
+        "even if the question, earlier conversation, memories or reference notes are in Vietnamese. "
+        "This setting overrides the persona's default Vietnamese language. Keep Amadeus/Kurisu's "
+        "identity and personality. Preserve names, code and original quotations when needed. "
+        "Do not announce or explain this language setting."
+    ),
+    "vi": (
+        "NGÔN NGỮ TRẢ LỜI CHO LƯỢT NÀY: tiếng Việt (vi). Trả lời hoàn toàn bằng tiếng Việt "
+        "tự nhiên, kể cả khi câu hỏi, lịch sử hoặc tài liệu tham chiếu bằng tiếng Anh. Giữ nguyên "
+        "danh tính, tính cách Amadeus/Kurisu; giữ tên riêng, mã nguồn và trích dẫn gốc khi cần. "
+        "Thiết lập này thay thế lựa chọn ngôn ngữ ở các lượt trước. Không thông báo hay giải thích thiết lập."
+    ),
+}
 MODES = {
     "amadeus": (
         "Bạn là phiên bản Amadeus của Kurisu. Ký ức nền là bản số hóa trước chuyến "

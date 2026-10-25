@@ -1,5 +1,6 @@
 'use strict';
 const $ = (id) => document.getElementById(id);
+const ui = window.AmadeusI18n;
 const state = {session: null, busy: false, navigating: false, controller: null, retry: null, ready: false, searchEnabled: true, selectedMode: 'amadeus', searchVersion: 0, role: 'guest', workspace: 0, initializing: 0, loading: false, refreshAuth: false};
 const modeNames = {amadeus: 'Amadeus', lab: 'Kurisu tại lab'};
 
@@ -9,8 +10,9 @@ function element(tag, className, text) {
   if (text !== undefined) node.textContent = text;
   return node;
 }
+function label(tag, className, text, values) { return ui.bind(element(tag, className), text, values); }
 function toast(message) {
-  $('toast').textContent = message;
+  ui.bind($('toast'), message);
   $('toast').hidden = false;
   clearTimeout(toast.timer);
   toast.timer = setTimeout(() => { $('toast').hidden = true; }, 2800);
@@ -53,7 +55,7 @@ async function api(path, options = {}) {
   return serverApi(path, options);
 }
 function error(message, canRetry = false) {
-  $('error-text').textContent = message;
+  ui.bind($('error-text'), message);
   $('error').hidden = false;
   $('retry').hidden = !canRetry;
 }
@@ -91,16 +93,25 @@ function scrollDown(force = false) {
 function syncMode(mode) {
   state.selectedMode = mode;
   $('mode').value = mode;
-  $('mode-description').textContent = mode === 'lab'
+  ui.bind($('mode-description'), mode === 'lab'
     ? 'Kurisu ở Alpha · những ngày tại Future Gadget Lab'
-    : 'Ký ức trước chuyến về Nhật · có thể học từ cuộc đối thoại này';
+    : 'Ký ức trước chuyến về Nhật · có thể học từ cuộc đối thoại này');
 }
 function message(role, text, pending = false, knowledge = [], sources = []) {
   $('welcome').hidden = true;
   const article = element('article', 'message ' + role + (pending ? ' pending' : ''));
-  if (role === 'assistant') article.append(element('div', 'message-avatar', 'A'));
+  if (role === 'assistant') {
+    const avatar = element('div', 'message-avatar');
+    const portrait = document.createElement('img');
+    portrait.src = '/assets/kurisu-account.jpg';
+    portrait.alt = '';
+    portrait.width = 48;
+    portrait.height = 48;
+    avatar.append(portrait);
+    article.append(avatar);
+  }
   const main = element('div', 'message-main');
-  main.append(element('div', 'message-label', role === 'assistant' ? 'MAKISE KURISU' : 'CẬU'));
+  main.append(label('div', 'message-label', role === 'assistant' ? 'MAKISE KURISU' : 'CẬU'));
   const body = element('div', 'message-body', text);
   if (role === 'assistant') window.AmadeusMarkdown.render(body, text);
   main.append(body);
@@ -111,7 +122,7 @@ function message(role, text, pending = false, knowledge = [], sources = []) {
 }
 function addMessageActions(main, text, knowledge, sources = []) {
   const actions = element('div', 'message-actions');
-  const copy = element('button', 'text-button', 'Sao chép');
+  const copy = label('button', 'text-button', 'Sao chép');
   copy.type = 'button';
   copy.addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(text); toast('Đã sao chép.'); }
@@ -119,9 +130,9 @@ function addMessageActions(main, text, knowledge, sources = []) {
   });
   actions.append(copy);
   if (knowledge.length) {
-    const refs = element('button', 'text-button', `Tham chiếu ${knowledge.length} ghi chú ↗`);
+    const refs = label('button', 'text-button', 'Tham chiếu {count} ghi chú ↗', {count: knowledge.length});
     refs.type = 'button';
-    refs.title = 'Những ghi chú được đưa vào prompt, không phải xác minh từng câu trả lời';
+    ui.attr(refs, 'title', 'Những ghi chú được đưa vào prompt, không phải xác minh từng câu trả lời');
     refs.addEventListener('click', () => openCanon(knowledge.map((k) => k.id)));
     actions.append(refs);
   }
@@ -153,16 +164,21 @@ async function refreshSessions() {
     const button = element('button', 'session-open');
     button.type = 'button';
     if (active) button.setAttribute('aria-current', 'page');
-    button.title = session.title;
-    button.append(element('strong', '', session.title));
-    const date = new Intl.DateTimeFormat('vi-VN', {day: '2-digit', month: '2-digit'}).format(new Date(session.updated_at));
-    button.append(element('small', '', `${modeNames[session.mode]} · ${date}`));
+    if (session.title === 'Cuộc trò chuyện mới') {
+      ui.attr(button, 'title', session.title);
+      button.append(label('strong', '', session.title));
+    } else {
+      button.title = session.title;
+      button.append(element('strong', '', session.title));
+    }
+    button.append(label('small', '', '{mode} · {date}', () => ({mode: ui.t(modeNames[session.mode]),
+      date: new Intl.DateTimeFormat(ui.locale, {day: '2-digit', month: '2-digit'}).format(new Date(session.updated_at))})));
     button.disabled = state.busy || state.navigating;
     button.addEventListener('click', () => navigate(() => loadSession(session.id)).catch((e) => error(e.message)));
     const remove = element('button', 'session-delete');
     remove.type = 'button';
-    remove.title = 'Xóa hội thoại';
-    remove.setAttribute('aria-label', 'Xóa hội thoại: ' + session.title);
+    ui.attr(remove, 'title', 'Xóa hội thoại');
+    ui.attr(remove, 'aria-label', 'Xóa hội thoại: {title}', {title: session.title});
     const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     icon.setAttribute('aria-hidden', 'true');
     const use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
@@ -173,7 +189,7 @@ async function refreshSessions() {
     row.append(button, remove);
     $('sessions').append(row);
   }
-  if (!sessions.length) $('sessions').append(element('p', 'empty-note', 'Chưa có cuộc trò chuyện nào. Bắt đầu bằng điều cậu đang nghĩ.'));
+  if (!sessions.length) $('sessions').append(label('p', 'empty-note', 'Chưa có cuộc trò chuyện nào. Bắt đầu bằng điều cậu đang nghĩ.'));
   return sessions;
 }
 async function loadSession(id) {
@@ -240,7 +256,8 @@ async function deleteSession(id) {
 }
 async function send(retry = false) {
   if (state.busy || state.navigating || state.loading) return;
-  const request = retry && state.retry ? state.retry : {text: $('input').value.trim(), request_id: crypto.randomUUID(), web_search: $('web-search').checked};
+  const request = retry && state.retry ? state.retry : {text: $('input').value.trim(), request_id: crypto.randomUUID(),
+    web_search: $('web-search').checked, language: ui.language};
   if (!request.text) return;
   $('error').hidden = true;
   // Lock controls before creating the first session, including double submits.
@@ -311,14 +328,19 @@ async function send(retry = false) {
         const payload = JSON.parse(data.join('\n'));
         if (event === 'error') throw new Error(payload.message);
         if (event === 'context') context = payload.knowledge;
-        if (event === 'search') assistant.body.textContent = 'Đang tra cứu tài liệu bên ngoài…';
+        if (event === 'search') {
+          assistant.body.dataset.uiSearch = 'true';
+          assistant.body.textContent = ui.t('Đang tra cứu tài liệu bên ngoài…');
+        }
         if (event === 'delta') {
+          delete assistant.body.dataset.uiSearch;
           if (!answer) document.dispatchEvent(new CustomEvent('amadeus:state', {detail: 'speaking'}));
           answer += payload.text;
           window.AmadeusMarkdown.stream(assistant.body, answer);
           scrollDown();
         }
         if (event === 'done') {
+          delete assistant.body.dataset.uiSearch;
           answer = payload.text;
           context = payload.knowledge || context;
           sources = payload.sources || [];
@@ -338,7 +360,7 @@ async function send(retry = false) {
     if (workspace !== state.workspace) return;
     assistant.article.classList.remove('pending');
     assistant.article.classList.add('interrupted');
-    assistant.main.append(element('div', 'interrupted-label', 'Lượt chưa xác nhận hoàn tất'));
+    assistant.main.append(label('div', 'interrupted-label', 'Lượt chưa xác nhận hoàn tất'));
     if (answer.trim()) addMessageActions(assistant.main, answer, context, sources);
     error(e.name === 'AbortError' ? 'Đã dừng nhận câu trả lời. Gửi lại sẽ kiểm tra kết quả đã lưu trước khi gọi model.' : e.message, true);
     $('input').value = request.text;
@@ -356,15 +378,15 @@ async function renderMemories() {
   if (workspace !== state.workspace) return;
   $('memory-count').textContent = notes.length;
   $('memory-list').replaceChildren();
-  if (!notes.length) $('memory-list').append(element('p', 'empty-note', 'Chưa có ghi chú. Chỉ những điều cậu chủ động lưu mới được thêm vào đây.'));
+  if (!notes.length) $('memory-list').append(label('p', 'empty-note', 'Chưa có ghi chú. Chỉ những điều cậu chủ động lưu mới được thêm vào đây.'));
   for (const note of notes) {
     const row = element('div', 'memory-item');
     row.append(element('span', '', note.content));
     const remove = element('button', 'icon-button', '×');
-    remove.setAttribute('aria-label', 'Quên ghi chú: ' + note.content.slice(0, 50));
+    ui.attr(remove, 'aria-label', 'Quên ghi chú: {content}', {content: note.content.slice(0, 50)});
     remove.addEventListener('click', async () => {
       try { await api('/memories/' + note.id, {method: 'DELETE'}); await renderMemories(); toast('Đã xóa ghi chú.'); }
-      catch (e) { $('memory-error').textContent = e.message; $('memory-error').hidden = false; }
+      catch (e) { ui.bind($('memory-error'), e.message); $('memory-error').hidden = false; }
     });
     row.append(remove);
     $('memory-list').append(row);
@@ -376,7 +398,7 @@ async function renderCanon(ids = null) {
   if (version !== state.searchVersion) return;
   $('canon-list').replaceChildren();
   const selected = ids ? entries.filter((e) => ids.includes(e.id)) : entries;
-  if (!selected.length) $('canon-list').append(element('p', 'empty-note', 'Không có ghi chú khớp từ khóa này. Thử tên nhân vật hoặc thuật ngữ khác.'));
+  if (!selected.length) $('canon-list').append(label('p', 'empty-note', 'Không có ghi chú khớp từ khóa này. Thử tên nhân vật hoặc thuật ngữ khác.'));
   for (const entry of selected) {
     const detail = element('details', 'canon-entry');
     if (ids) detail.open = true;
@@ -398,7 +420,7 @@ async function openCanon(ids = null) {
   $('canon-search').value = '';
   if (!$('canon-dialog').open) $('canon-dialog').showModal();
   try { await renderCanon(ids); }
-  catch (e) { $('canon-list').replaceChildren(element('p', 'dialog-error', e.message)); }
+  catch (e) { $('canon-list').replaceChildren(label('p', 'dialog-error', e.message)); }
 }
 function closeSidebar() {
   $('sidebar').classList.remove('open');
@@ -412,15 +434,14 @@ function showLogin() {
 function showRole(role) {
   state.role = role;
   const admin = role === 'admin';
-  $('profile-icon').textContent = admin ? 'A' : 'U';
-  $('profile-title').textContent = admin ? 'Không gian admin' : 'Hệ thống';
-  $('profile-description').textContent = admin ? 'Lịch sử lưu trên máy chủ' : 'Lịch sử chỉ trên trình duyệt này';
-  $('profile-badge').textContent = admin ? 'ADMIN' : 'KHÁCH';
-  $('account-button').setAttribute('aria-label', admin ? 'Mở không gian admin' : 'Hệ thống');
+  ui.bind($('profile-title'), admin ? 'Không gian admin' : 'Hệ thống');
+  ui.bind($('profile-description'), admin ? 'Lịch sử lưu trên máy chủ' : 'Lịch sử chỉ trên trình duyệt');
+  ui.bind($('profile-badge'), admin ? 'ADMIN' : 'KHÁCH');
+  ui.attr($('account-button'), 'aria-label', admin ? 'Mở không gian admin' : 'Hệ thống');
   $('account-button').setAttribute('aria-controls', admin ? 'account-dialog' : 'login-dialog');
-  $('memory-privacy').textContent = admin
+  ui.bind($('memory-privacy'), admin
     ? 'Ghi chú admin được lưu trên máy chủ và gửi đến nhà cung cấp AI khi trả lời. Xóa ghi chú sẽ ngừng dùng nó cho các lượt mới.'
-    : 'Ghi chú chỉ lưu trên trình duyệt này, không ghi vào máy chủ. Nội dung liên quan được gửi đến AI khi trò chuyện. Xóa dữ liệu trang sẽ xóa các ghi chú này.';
+    : 'Ghi chú chỉ lưu trên trình duyệt này, không ghi vào máy chủ. Nội dung liên quan được gửi đến AI khi trò chuyện. Xóa dữ liệu trang sẽ xóa các ghi chú này.');
 }
 async function initialize() {
   const initializing = ++state.initializing;
@@ -450,7 +471,7 @@ async function initialize() {
     if (!status.web_search_enabled) $('web-search').checked = false;
     if ($('login-dialog').open) $('login-dialog').close();
     $('setup-banner').hidden = status.model_ready;
-    $('connection-text').textContent = status.model_ready ? 'SẴN SÀNG ĐỐI THOẠI' : 'CHỜ KẾT NỐI MODEL';
+    ui.bind($('connection-text'), status.model_ready ? 'SẴN SÀNG ĐỐI THOẠI' : 'CHỜ KẾT NỐI MODEL');
     $('connection-dot').classList.toggle('ready', status.model_ready);
     syncMode(status.default_mode);
     const sessions = await refreshSessions();
@@ -517,21 +538,21 @@ $('delete-chat').addEventListener('click', async () => {
 });
 $('open-memory').addEventListener('click', async () => {
   $('memory-error').hidden = true; $('memory-dialog').showModal();
-  try { await renderMemories(); } catch (e) { $('memory-error').textContent = e.message; $('memory-error').hidden = false; }
+  try { await renderMemories(); } catch (e) { ui.bind($('memory-error'), e.message); $('memory-error').hidden = false; }
 });
 $('memory-form').addEventListener('submit', async (e) => {
   e.preventDefault(); const button = $('memory-form').querySelector('button'); button.disabled = true;
   try {
     await api('/memories', {method: 'POST', body: JSON.stringify({content: $('memory-input').value.trim()})});
     $('memory-input').value = ''; $('memory-error').hidden = true; await renderMemories(); toast('Đã lưu ghi chú.');
-  } catch (e) { $('memory-error').textContent = e.message; $('memory-error').hidden = false; }
+  } catch (e) { ui.bind($('memory-error'), e.message); $('memory-error').hidden = false; }
   finally { button.disabled = false; }
 });
 $('open-canon').addEventListener('click', () => openCanon());
 $('canon-search').addEventListener('input', () => {
   clearTimeout(state.searchTimer);
   state.searchVersion++;
-  state.searchTimer = setTimeout(() => renderCanon().catch((e) => { $('canon-list').replaceChildren(element('p', 'dialog-error', e.message)); }), 200);
+  state.searchTimer = setTimeout(() => renderCanon().catch((e) => { $('canon-list').replaceChildren(label('p', 'dialog-error', e.message)); }), 200);
 });
 document.querySelectorAll('.close-dialog').forEach((button) => button.addEventListener('click', () => button.closest('dialog').close()));
 $('account-button').addEventListener('click', () => {
@@ -552,7 +573,7 @@ $('login-form').addEventListener('submit', async (e) => {
       $('password').value = ''; authChanged(); await initialize();
     });
   }
-  catch (e) { $('login-error').textContent = e.message; $('login-error').hidden = false; }
+  catch (e) { ui.bind($('login-error'), e.message); $('login-error').hidden = false; }
   finally { button.disabled = false; }
 });
 $('admin-logout').addEventListener('click', () => navigate(async () => {
@@ -569,5 +590,10 @@ window.addEventListener('storage', event => {
       await renderMemories();
     }).catch(e => error(e.message));
   }
+});
+document.addEventListener('amadeus:language', () => {
+  document.querySelectorAll('.message-body[data-ui-search]').forEach(node => {
+    node.textContent = ui.t('Đang tra cứu tài liệu bên ngoài…');
+  });
 });
 initialize();

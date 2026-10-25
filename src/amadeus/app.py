@@ -45,6 +45,7 @@ class ChatInput(BaseModel):
     text: str = Field(min_length=1, max_length=6000)
     request_id: UUID
     web_search: bool = False
+    language: Literal["vi", "en"] = "vi"
 
     @field_validator("text")
     @classmethod
@@ -252,7 +253,8 @@ def create_app(settings: Settings | None = None, *, model=None) -> FastAPI:
     async def guest_message(body: GuestChatInput, request: Request):
         return stream_events(app.state.chat.guest_events(
             request.state.visitor, request.client.host if request.client else "local", body.mode, body.text, str(body.request_id),
-            [message.model_dump() for message in body.history], [note.model_dump() for note in body.memories], web_search=body.web_search))
+            [message.model_dump() for message in body.history], [note.model_dump() for note in body.memories],
+            web_search=body.web_search, language=body.language))
 
     @app.get("/api/sessions")
     async def sessions(identity=Depends(owner)):
@@ -289,7 +291,8 @@ def create_app(settings: Settings | None = None, *, model=None) -> FastAPI:
     @app.post("/api/sessions/{sid}/messages")
     async def message(sid: UUID, body: ChatInput, identity=Depends(owner)):
         await app.state.chat.require_session(identity, str(sid))
-        return stream_events(app.state.chat.events(identity, str(sid), body.text, str(body.request_id), web_search=body.web_search))
+        return stream_events(app.state.chat.events(identity, str(sid), body.text, str(body.request_id),
+                                                   web_search=body.web_search, language=body.language))
 
     @app.get("/api/memories")
     async def memories(identity=Depends(owner)):

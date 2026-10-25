@@ -3,6 +3,7 @@
 // A small authored phrase bank: no chat text is sent to a speech service.
 (() => {
   const $ = (id) => document.getElementById(id);
+  const ui = window.AmadeusI18n;
   const toggle = $('voice-toggle');
   const preview = $('voice-preview');
   const bubble = $('voice-bubble');
@@ -42,8 +43,8 @@
   }
   function controls() {
     toggle.setAttribute('aria-pressed', String(enabled));
-    toggle.setAttribute('aria-label', enabled ? 'Tắt giọng Kurisu' : 'Bật giọng Kurisu');
-    $('voice-toggle-label').textContent = enabled ? 'Giọng Nhật · bật' : 'Bật giọng Nhật';
+    ui.attr(toggle, 'aria-label', enabled ? 'Tắt giọng Kurisu' : 'Bật giọng Kurisu');
+    ui.bind($('voice-toggle-label'), enabled ? 'Giọng Nhật · bật' : 'Bật giọng Nhật');
     toggle.classList.toggle('active', enabled);
   }
   function selectProfile(profile) {
@@ -51,10 +52,10 @@
     bank = profile.lines;
     lastLine = '';
     selector.value = profile.id;
-    toggle.title = profile.label + ' · giọng nhân vật tổng hợp';
+    ui.attr(toggle, 'title', '{profile} · {description}', () => ({profile: ui.t(profile.label), description: ui.t('giọng nhân vật tổng hợp')}));
     $('voice-credit').textContent = profile.credit || '';
     $('voice-credit').hidden = !profile.credit;
-    status.textContent = enabled ? 'Tiếng Nhật · phụ đề Việt' : 'Giọng anime · bấm để bật';
+    ui.bind(status, enabled ? 'Tiếng Nhật · phụ đề Việt' : 'Giọng anime · bấm để bật');
   }
   function stop(hide = true) {
     sequence++;
@@ -136,7 +137,7 @@
       enabled = false;
       controls();
       clearTimeout(idleTimer);
-      status.textContent = 'Chưa phát được âm thanh. Bấm bật giọng để thử lại.';
+      ui.bind(status, 'Chưa phát được âm thanh. Bấm bật giọng để thử lại.');
     };
     audio.onerror = failed;
     // Start from the click's user activation; don't await any network request.
@@ -144,9 +145,9 @@
       if (token !== sequence) return;
       playing = true;
       bubble.dataset.speaking = 'true';
-      $('voice-subtitle').textContent = line.vi;
+      ui.bind($('voice-subtitle'), line.vi);
       bubble.hidden = false;
-      status.textContent = 'Tiếng Nhật · phụ đề Việt';
+      ui.bind(status, 'Tiếng Nhật · phụ đề Việt');
       meter();
     }).catch(failed);
     scheduleIdle();
@@ -155,13 +156,13 @@
     const value = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd');
     if (/christina|kurisutina|tro ly|assistant|tsundere/.test(value)) return 'tease';
     if (/ngu ngon|oyasumi|good\s*night/.test(value)) return 'night';
-    if (/\b(met|buon|stress|nan|co don|kiet suc)\b/.test(value)) return 'comfort';
+    if (/\b(met|buon|stress|nan|co don|kiet suc|tired|sad|lonely|exhausted|discouraged)\b/.test(value)) return 'comfort';
     if (/cam on|arigato|thank/.test(value)) return 'thanks';
     if (/de thuong|dang yeu|xinh|yeu cau|yeu ban|kawaii|cute/.test(value)) return 'praise';
     if (/okabe|hououin|kyouma/.test(value)) return 'okabe';
-    if (/ban la ai|cau la ai|ai tao|amadeus la/.test(value)) return 'identity';
-    if (/d-?mail|time.?leap|world.?line|ky uc|than kinh|vat ly|khoa hoc|gia thuyet/.test(value)) return 'science';
-    if (/\b(hoc|code|python|lap trinh|bai tap)\b/.test(value)) return 'study';
+    if (/ban la ai|cau la ai|ai tao|amadeus la|who are you|who (made|created) you/.test(value)) return 'identity';
+    if (/d-?mail|time.?leap|world.?line|ky uc|than kinh|vat ly|khoa hoc|gia thuyet|memor(y|ies)|neuro|physics|science|hypothesis/.test(value)) return 'science';
+    if (/\b(hoc|code|python|lap trinh|bai tap|study|learning|homework|programming)\b/.test(value)) return 'study';
     if (/^(chao|hello|hi\b|xin chao|ohayo|konnichiwa)/.test(value)) return 'greeting';
     return 'reply';
   }
@@ -170,7 +171,7 @@
     controls();
     lastInteraction = Date.now();
     if (enabled) playGroup('welcome');
-    else { stop(); clearTimeout(idleTimer); status.textContent = 'Âm thanh đang tắt'; }
+    else { stop(); clearTimeout(idleTimer); ui.bind(status, 'Âm thanh đang tắt'); }
   });
   preview.addEventListener('click', () => {
     enabled = true; controls(); lastInteraction = Date.now(); playGroup('idle');
@@ -234,7 +235,7 @@
       selector.replaceChildren();
       for (const profile of profiles) {
         const option = document.createElement('option');
-        option.value = profile.id; option.textContent = profile.label; selector.append(option);
+        option.value = profile.id; ui.bind(option, profile.label); selector.append(option);
       }
       const remembered = localStorage.getItem('amadeus.voice.profile');
       const selected = profiles.find((profile) => profile.id === remembered)
@@ -244,12 +245,12 @@
       $('voice-choice').hidden = false;
     } else {
       bank = validLines(manifest.lines);
-      status.textContent = 'Giọng Nhật thử nghiệm · bấm để bật';
-      toggle.title = manifest.label + ' · giọng nữ Nhật tổng hợp';
+      ui.bind(status, 'Giọng Nhật thử nghiệm · bấm để bật');
+      ui.attr(toggle, 'title', '{profile} · {description}', () => ({profile: ui.t(manifest.label), description: ui.t('giọng nữ Nhật tổng hợp')}));
     }
     if (!bank.length) throw new Error('empty voice bank');
     toggle.disabled = false; preview.disabled = busy;
   }).catch(() => {
-    status.textContent = 'Chưa có bộ giọng. Xem Hệ thống & nguồn.';
+    ui.bind(status, 'Chưa có bộ giọng. Xem Hệ thống & nguồn.');
   });
 })();
