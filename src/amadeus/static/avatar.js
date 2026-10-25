@@ -11,6 +11,20 @@ let release = () => {};
 let ready = false;
 let voiceSpeaking = false;
 let voiceLevel = 0;
+let expression = 'neutral';
+const poses = {
+  neutral: {brow: 0, height: 0, smile: 0, mouth: 0, cheek: 0, eye: 1, tilt: 0},
+  thinking: {brow: -0.25, height: -0.12, smile: 0, mouth: -0.15, cheek: 0, eye: 0.9, tilt: -3},
+  curious: {brow: 0.2, height: 0.25, smile: 0, mouth: 0.2, cheek: 0, eye: 1, tilt: 3},
+  gentle: {brow: -0.15, height: 0.12, smile: 0.25, mouth: 0.25, cheek: 0, eye: 0.9, tilt: 2},
+  shy: {brow: -0.25, height: 0.15, smile: 0.3, mouth: 0.35, cheek: 0.7, eye: 0.85, tilt: -4},
+  annoyed: {brow: -0.7, height: -0.3, smile: 0, mouth: -0.45, cheek: 0.2, eye: 0.8, tilt: -2},
+  happy: {brow: 0.2, height: 0.2, smile: 0.6, mouth: 0.65, cheek: 0.2, eye: 0.95, tilt: 2},
+};
+const pose = {...poses.neutral};
+document.addEventListener('amadeus:expression', event => { if (Object.hasOwn(poses, event.detail.mood)) expression = event.detail.mood; });
+// Presence may initialize before this module finishes downloading.
+if (Object.hasOwn(poses, document.getElementById('avatar-container').dataset.mood)) expression = document.getElementById('avatar-container').dataset.mood;
 
 document.addEventListener('amadeus:state', (event) => { mode = event.detail; });
 document.addEventListener('amadeus:voice', (event) => {
@@ -121,7 +135,8 @@ async function start() {
     const width = Math.max(1, Math.round(canvas.clientWidth * ratio));
     const height = Math.max(1, Math.round(canvas.clientHeight * ratio));
     if (canvas.width !== width || canvas.height !== height) { canvas.width = width; canvas.height = height; }
-    const moving = !reducedMotion.matches;
+    const moving = !reducedMotion.matches && document.documentElement.dataset.motion !== 'reduce';
+    for (const key of Object.keys(pose)) pose[key] += (poses[expression][key] - pose[key]) * (moving ? Math.min(1, dt * 5) : 1);
     gazeX += ((moving ? targetX : 0) - gazeX) * Math.min(1, dt * 4);
     gazeY += ((moving ? targetY : 0) - gazeY) * Math.min(1, dt * 4);
     if (moving && time >= nextBlink && blinkStart < 0) blinkStart = time;
@@ -131,10 +146,14 @@ async function start() {
       eye = Math.abs(2 * Math.min(1, progress) - 1);
       if (progress >= 1) { blinkStart = -1; nextBlink = time + 3 + Math.random() * 3; }
     }
-    set('ParamEyeLOpen', eye); set('ParamEyeROpen', eye);
+    set('ParamEyeLOpen', eye * pose.eye); set('ParamEyeROpen', eye * pose.eye);
+    set('ParamEyeLSmile', pose.smile); set('ParamEyeRSmile', pose.smile);
+    set('ParamBrowLAngle', pose.brow); set('ParamBrowRAngle', pose.brow);
+    set('ParamBrowLY', pose.height); set('ParamBrowRY', pose.height);
+    set('ParamMouthForm', pose.mouth); set('ParamCheek', pose.cheek);
     set('ParamEyeBallX', gazeX * 0.6); set('ParamEyeBallY', gazeY * 0.5);
     set('ParamAngleX', gazeX * 8 + (moving ? Math.sin(time * 0.65) : 0));
-    set('ParamAngleY', gazeY * 5); set('ParamAngleZ', moving ? Math.sin(time * 0.43) : 0);
+    set('ParamAngleY', gazeY * 5); set('ParamAngleZ', pose.tilt + (moving ? Math.sin(time * 0.43) : 0));
     set('ParamBreath', moving ? 0.45 + Math.sin(time * 1.6) * 0.2 : 0.45);
     set('ParamBodyAngleX', moving ? Math.sin(time * 0.5) * 1.2 : 0);
     // Cached Japanese clips drive the mouth from their measured audio amplitude.

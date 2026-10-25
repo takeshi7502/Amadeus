@@ -76,6 +76,7 @@ function updateControls() {
   $('send').disabled = state.navigating || state.loading;
   $('web-search').disabled = blocked || !state.searchEnabled;
   document.querySelectorAll('.session-open, .session-delete, .suggestions button').forEach((b) => { b.disabled = blocked; });
+  document.dispatchEvent(new CustomEvent('amadeus:workspace', {detail: {role: state.role, blocked}}));
   refreshAuthWhenIdle();
 }
 async function navigate(action) {
@@ -120,7 +121,7 @@ function message(role, text, pending = false, knowledge = [], sources = []) {
   $('messages').append(article);
   return {article, body, main};
 }
-function addMessageActions(main, text, knowledge, sources = []) {
+function addMessageActions(main, text, knowledge, sources = [], complete = true) {
   const actions = element('div', 'message-actions');
   const copy = label('button', 'text-button', 'Sao chép');
   copy.type = 'button';
@@ -129,6 +130,15 @@ function addMessageActions(main, text, knowledge, sources = []) {
     catch { toast('Trình duyệt không cho sao chép. Cậu có thể chọn đoạn văn trực tiếp.'); }
   });
   actions.append(copy);
+  if (complete) {
+    const keep = label('button', 'text-button moment-save', '☆ Lưu kỷ niệm');
+    keep.type = 'button';
+    keep.addEventListener('click', () => document.dispatchEvent(new CustomEvent('amadeus:keepsake', {detail: {
+      role: state.role, sessionId: state.session?.id, text,
+      question: main.closest('.message')?.previousElementSibling?.querySelector('.message-body')?.textContent || '',
+    }})));
+    actions.append(keep);
+  }
   if (knowledge.length) {
     const refs = label('button', 'text-button', 'Tham chiếu {count} ghi chú ↗', {count: knowledge.length});
     refs.type = 'button';
@@ -286,6 +296,7 @@ async function send(retry = false) {
   const guest = state.role === 'guest';
   const workspace = state.workspace;
   setBusy(true);
+  document.dispatchEvent(new CustomEvent('amadeus:turn', {detail: {userText: request.text}}));
   state.retry = request;
   state.controller = new AbortController();
   $('input').value = '';
@@ -361,7 +372,7 @@ async function send(retry = false) {
     assistant.article.classList.remove('pending');
     assistant.article.classList.add('interrupted');
     assistant.main.append(label('div', 'interrupted-label', 'Lượt chưa xác nhận hoàn tất'));
-    if (answer.trim()) addMessageActions(assistant.main, answer, context, sources);
+    if (answer.trim()) addMessageActions(assistant.main, answer, context, sources, false);
     error(e.name === 'AbortError' ? 'Đã dừng nhận câu trả lời. Gửi lại sẽ kiểm tra kết quả đã lưu trước khi gọi model.' : e.message, true);
     $('input').value = request.text;
   } finally {
@@ -597,3 +608,20 @@ document.addEventListener('amadeus:language', () => {
   });
 });
 initialize();
+
+// The lab composes ordinary user messages, so scenes use the same history and
+// language handling as chat. It never sends a message without the send action.
+window.AmadeusChat = Object.freeze({
+  get role() { return state.role; },
+  get blocked() { return state.busy || state.navigating || state.loading; },
+  compose(text) {
+    if (this.blocked) return false;
+    const current = $('input').value.trim();
+    const draft = current ? current + '\n\n' + text : text;
+    if (draft.length > 6000) return false;
+    $('input').value = draft;
+    $('input').dispatchEvent(new Event('input'));
+    $('input').focus();
+    return true;
+  },
+});

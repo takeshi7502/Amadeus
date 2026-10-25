@@ -7,10 +7,13 @@ Bộ hiện tại dùng **VOICEVOX:四国めたん** — Shikoku Metan — có h
 
 ## Dùng trên web
 
-- Bấm **Bật giọng Nhật** dưới model để nghe lời chào và thấy bản dịch Việt.
-  Mỗi lần tải trang cần bấm bật một lần để cho phép trình duyệt phát âm thanh.
+- Khi model sẵn sàng, web thử phát lời chào một lần mỗi lần mở trang. Nếu trình
+  duyệt chặn tự phát, lời chào đợi thao tác đầu tiên. Tắt giọng được nhớ cho lần
+  truy cập sau; bấm **Bật giọng Nhật** để bật lại. Phụ đề theo VI/EN của giao diện.
 - **Nghe thử** phát một câu ngẫu nhiên. Bấm model khi đã bật giọng để nghe phản
   ứng ngắn; bấm nút × trên bong bóng để dừng câu đang phát.
+  Nút **Gọi Kurisu** cũng có phản hồi chữ khi tắt giọng. Các phản ứng trực tiếp
+  không nói đè lên clip đang phát; bấm nhiều lần có phản ứng hờn nhẹ và giới hạn tần suất.
 - **Chọn giọng anime** dưới model để nghe cùng một câu chào bằng giọng vừa
   chọn. Lựa chọn được nhớ trong trình duyệt. Đổi giọng sẽ dừng câu đang phát.
 - Mở dòng trạng thái dưới các nút để chỉnh âm lượng hoặc tắt **Thỉnh thoảng

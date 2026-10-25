@@ -133,12 +133,12 @@
       context.resume().catch(() => {});
     } catch { /* HTML audio still works without a meter. */ }
   }
-  function playGroup(group, {arrival = false} = {}) {
+  function playGroup(group, {arrival = false, lineId} = {}) {
     if (!available()) return;
     const options = bank.filter((line) => line.group === group);
     const fresh = options.filter((line) => line.id !== lastLine);
     const pool = fresh.length ? fresh : options;
-    const line = pool[Math.floor(Math.random() * pool.length)];
+    const line = options.find((item) => item.id === lineId) || pool[Math.floor(Math.random() * pool.length)];
     if (!line) return;
     stop();
     const token = sequence;
@@ -261,8 +261,11 @@
   observer.observe($('character-panel'), {attributes: true, attributeFilter: ['inert', 'class']});
   observer.observe($('avatar-container'), {attributes: true, attributeFilter: ['data-state']});
   document.querySelectorAll('dialog').forEach((dialog) => observer.observe(dialog, {attributes: true, attributeFilter: ['open']}));
-  $('kurisu-canvas').addEventListener('click', () => {
-    if (enabled && !playing && Date.now() - lastInteraction < 1000) playGroup('touch');
+  document.addEventListener('amadeus:reaction', (event) => {
+    if (enabled && !playing && ['touch', 'greeting', 'idle', 'science', 'study'].includes(event.detail.group)) {
+      arrivalPending = false;
+      playGroup(event.detail.group, {lineId: event.detail.lineId});
+    }
   });
   window.addEventListener('pagehide', () => { arrivalPending = false; stop(); clearTimeout(idleTimer); });
   controls();

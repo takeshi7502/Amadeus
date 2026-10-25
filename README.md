@@ -77,6 +77,14 @@ Metan: **ngọt ngào** (mặc định) và **tsundere**, chọn ngay dưới mo
 bằng `powershell -File tools/setup_anime_voice.ps1`. Mỗi giọng có 20 câu phản ứng
 và lời nói lúc rảnh; chưa phải giọng Kurisu gốc hay đọc toàn bộ chat.
 
+**Không gian lab** ở cuối sidebar có ba cảnh nhập vai, bốn thử thách logic/trí
+nhớ, nhật ký kỷ niệm và tùy chỉnh không khí. Cảnh và bài tập được đưa vào ô soạn
+để xem/sửa trước khi gửi. Bấm **☆ Lưu kỷ niệm** dưới câu trả lời để giữ trích đoạn
+trên trình duyệt; nhật ký khách và admin tách riêng, không tự đưa vào prompt AI.
+Model phản ứng bằng biểu cảm khi chat, khi gọi hoặc bấm vào nhân vật. Âm nền,
+âm báo kết nối là tùy chọn; có chế độ ban đêm và giảm chuyển động. Xem
+[hướng dẫn và cấu trúc tính năng](docs/LAB.md).
+
 - `amadeus`: snapshot trước chuyến về Nhật; không nhận ký ức Alpha là đã trải qua.
 - `lab`: vẫn là AI Amadeus, bổ sung lớp tham chiếu dữ liệu Kurisu ở lab Alpha.
 - Web nhớ hội thoại gần nhất cho từng chế độ. Đổi chế độ và mở cuộc trò chuyện
