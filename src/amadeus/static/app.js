@@ -413,10 +413,10 @@ function showRole(role) {
   state.role = role;
   const admin = role === 'admin';
   $('profile-icon').textContent = admin ? 'A' : 'U';
-  $('profile-title').textContent = admin ? 'Không gian admin' : 'Đăng nhập admin';
+  $('profile-title').textContent = admin ? 'Không gian admin' : 'Hệ thống';
   $('profile-description').textContent = admin ? 'Lịch sử lưu trên máy chủ' : 'Lịch sử chỉ trên trình duyệt này';
   $('profile-badge').textContent = admin ? 'ADMIN' : 'KHÁCH';
-  $('account-button').setAttribute('aria-label', admin ? 'Mở không gian admin' : 'Đăng nhập admin');
+  $('account-button').setAttribute('aria-label', admin ? 'Mở không gian admin' : 'Hệ thống');
   $('account-button').setAttribute('aria-controls', admin ? 'account-dialog' : 'login-dialog');
   $('memory-privacy').textContent = admin
     ? 'Ghi chú admin được lưu trên máy chủ và gửi đến nhà cung cấp AI khi trả lời. Xóa ghi chú sẽ ngừng dùng nó cho các lượt mới.'
