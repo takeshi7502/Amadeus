@@ -46,7 +46,7 @@
     'Mở lịch sử': 'Open history', 'Kết nối với Kurisu': 'Connected to Kurisu',
     'Chế độ Amadeus': 'Amadeus mode', 'Chuyển về hội thoại gần nhất của chế độ này': 'Open the latest conversation in this mode',
     'Amadeus · bản ký ức': 'Amadeus · memory snapshot', 'Amadeus · dữ liệu lab Alpha': 'Amadeus · Alpha lab data',
-    'Hiện Kurisu': 'Show Kurisu', 'Tải hội thoại JSON': 'Download conversation as JSON',
+    'Hiện Kurisu': 'Show Kurisu', 'Ẩn Kurisu': 'Hide Kurisu', 'Tải hội thoại JSON': 'Download conversation as JSON',
     'Xóa cuộc hội thoại': 'Delete conversation', 'Xóa hội thoại': 'Delete conversation',
     'Xóa hội thoại: {title}': 'Delete conversation: {title}',
     'Chưa kết nối model. Điền thông tin AI trong': 'No model connected. Add your AI settings to',

@@ -70,7 +70,7 @@ function setBusy(busy) {
 }
 function updateControls() {
   const blocked = state.busy || state.navigating || state.loading;
-  for (const id of ['new-chat', 'mode', 'delete-chat', 'export']) $(id).disabled = blocked;
+  for (const id of ['new-chat', 'mode', 'export']) $(id).disabled = blocked;
   $('account-button').disabled = blocked;
   $('admin-logout').disabled = blocked;
   $('send').disabled = state.navigating || state.loading;
@@ -515,8 +515,15 @@ compactLayout.addEventListener('change', syncPanelAccess);
 syncPanelAccess();
 $('menu').addEventListener('click', () => { const open = $('sidebar').classList.toggle('open'); $('menu').setAttribute('aria-expanded', String(open)); syncPanelAccess(); });
 $('show-avatar').setAttribute('aria-expanded', 'false');
-$('show-avatar').addEventListener('click', () => { const open = $('character-panel').classList.toggle('open'); $('show-avatar').setAttribute('aria-expanded', String(open)); syncPanelAccess(); });
-function closeAvatar() { $('character-panel').classList.remove('open'); $('show-avatar').setAttribute('aria-expanded', 'false'); syncPanelAccess(); }
+function setAvatarOpen(open) {
+  $('character-panel').classList.toggle('open', open);
+  $('show-avatar').setAttribute('aria-expanded', String(open));
+  ui.attr($('show-avatar'), 'aria-label', open ? 'Ẩn Kurisu' : 'Hiện Kurisu');
+  ui.attr($('show-avatar'), 'title', open ? 'Ẩn Kurisu' : 'Hiện Kurisu');
+  syncPanelAccess();
+}
+$('show-avatar').addEventListener('click', () => setAvatarOpen(!$('character-panel').classList.contains('open')));
+function closeAvatar() { setAvatarOpen(false); }
 $('close-avatar').addEventListener('click', closeAvatar);
 $('open-about').addEventListener('click', () => { closeSidebar(); $('about-dialog').showModal(); });
 document.addEventListener('pointerdown', (e) => { if (!$('character-panel').contains(e.target) && !$('show-avatar').contains(e.target)) closeAvatar(); });
@@ -541,11 +548,6 @@ $('export').addEventListener('click', () => {
   } else {
     const link = element('a'); link.href = `/api/sessions/${state.session.id}/export`; link.download = `amadeus-${state.session.id}.json`; link.click();
   }
-});
-$('delete-chat').addEventListener('click', async () => {
-  if (!state.session) return;
-  try { await navigate(() => deleteSession(state.session.id)); }
-  catch (e) { error(e.message); }
 });
 $('open-memory').addEventListener('click', async () => {
   $('memory-error').hidden = true; $('memory-dialog').showModal();

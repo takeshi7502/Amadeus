@@ -7,12 +7,12 @@
   <meta name="description" content="Amadeus — trò chuyện với một bản mô phỏng Makise Kurisu từ Steins;Gate.">
   <title>Amadeus · Makise Kurisu</title>
   <link rel="icon" type="image/webp" href="/runtime/branding/logo.webp">
-  <link rel="stylesheet" href="/assets/style.css?v=20261026-lab1">
-  <script src="/assets/i18n.js?v=20261026-lab1" defer></script>
+  <link rel="stylesheet" href="/assets/style.css?v=20261026-mobile3">
+  <script src="/assets/i18n.js?v=20261026-mobile2" defer></script>
   <script src="/assets/vendor/markdown-it.min.js?v=15.0.3" defer></script>
   <script src="/assets/markdown.js?v=20261026-markdown1" defer></script>
   <script src="/assets/guest-storage.js?v=20261026-public1" defer></script>
-  <script src="/assets/app.js?v=20261026-lab1" defer></script>
+  <script src="/assets/app.js?v=20261026-mobile2" defer></script>
   <script src="/assets/voice.js?v=20261026-lab1" defer></script>
   <script src="/assets/experience-data.js?v=20261026-lab1" defer></script>
   <script src="/assets/presence.js?v=20261026-lab1" defer></script>
@@ -46,9 +46,8 @@
           <option value="amadeus">Amadeus · bản ký ức</option>
           <option value="lab">Amadeus · dữ liệu lab Alpha</option>
         </select>
-        <button id="show-avatar" class="icon-button avatar-toggle" aria-label="Hiện Kurisu" aria-expanded="false" title="Hiện Kurisu"><svg aria-hidden="true"><use href="/assets/icons.svg#person"/></svg></button>
+        <button id="show-avatar" class="avatar-button avatar-toggle" type="button" aria-label="Hiện Kurisu" aria-expanded="false" aria-controls="character-panel" title="Hiện Kurisu"><img src="/assets/kurisu-account.jpg" alt="" width="48" height="48"></button>
         <button id="export" class="icon-button" aria-label="Tải hội thoại JSON" title="Tải hội thoại JSON"><svg aria-hidden="true"><use href="/assets/icons.svg#download"/></svg></button>
-        <button id="delete-chat" class="icon-button" aria-label="Xóa cuộc hội thoại" title="Xóa cuộc hội thoại"><svg aria-hidden="true"><use href="/assets/icons.svg#trash"/></svg></button>
       </div>
     </header>
     <div id="setup-banner" class="setup-banner" hidden>Chưa kết nối model. Điền thông tin AI trong <code>settings.toml</code> rồi khởi động lại máy chủ.</div>
