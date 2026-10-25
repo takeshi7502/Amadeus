@@ -8,7 +8,7 @@
   const tones = new Set();
   function pref(key) { try { return localStorage.getItem('amadeus.atmosphere.' + key); } catch { return null; } }
   function save(key, value) { try { localStorage.setItem('amadeus.atmosphere.' + key, value); } catch { /* Optional preferences. */ } }
-  $('night-mode').checked = pref('night') === 'on';
+  $('night-mode').checked = pref('night') !== 'off';
   $('reduce-motion').checked = pref('motion') === 'on' || motion.matches;
   $('reduce-motion').disabled = motion.matches;
   $('lab-ambient').checked = pref('ambient') === 'on';
