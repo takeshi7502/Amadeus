@@ -96,7 +96,9 @@ def load_settings(path: Path | None = None) -> Settings:
     if serverless:
         values.update(serverless=True, secure_cookie=True, telegram_enabled=False)
         values.setdefault("assets_dir", ROOT / "public/runtime")
-        values.setdefault("allowed_hosts", ["*.vercel.app", "localhost", "127.0.0.1"])
+        # Vercel routes only domains attached to this project. Accept those
+        # hostnames without requiring another code/env change for every alias.
+        values.setdefault("allowed_hosts", ["*"])
     if "AMADEUS_WEB_SEARCH_ENABLED" in os.environ:
         values["web_search_enabled"] = os.environ["AMADEUS_WEB_SEARCH_ENABLED"].lower() in {"1", "true", "yes"}
     settings = Settings.model_validate(values)

@@ -30,7 +30,7 @@ và Preview. Danh sách tên có trong [`.env.example`](../.env.example):
 | `AMADEUS_API_URL` | URL API công khai, ví dụ `https://<provider>/v1` |
 | `AMADEUS_API_KEY` | API key của provider |
 | `AMADEUS_API_TYPE` | `chat_completions` hoặc `responses` |
-| `AMADEUS_ALLOWED_HOSTS` | Mặc định `*.vercel.app`; thêm domain riêng bằng dấu phẩy |
+| `AMADEUS_ALLOWED_HOSTS` | Mặc định `*` trên Vercel: dùng được mọi domain đã gắn với project. Chỉ đặt danh sách phân cách bằng dấu phẩy nếu muốn chủ động giới hạn domain. |
 | `AMADEUS_WEB_SEARCH_ENABLED` | `true` hoặc `false` |
 
 Không gửi key/mật khẩu vào chat hoặc đưa `settings.toml` lên Vercel/Git.
