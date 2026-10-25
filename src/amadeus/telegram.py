@@ -128,7 +128,7 @@ class TelegramBot:
             return
         if command == "/reset":
             session = await self.current(owner)
-            async with self.chat.lock(session["id"]):
+            async with self.chat.guard(session["id"]):
                 await self.store.delete_session(owner, session["id"])
             await self.store.set_runtime("active:" + owner, "")
             await self.send(cid, "Đã xóa cuộc trò chuyện hiện tại. Ghi chú riêng vẫn còn; dùng /forget để xóa từng ghi chú.")

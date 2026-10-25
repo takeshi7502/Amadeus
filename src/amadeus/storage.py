@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import asyncio
+import sqlite3
 import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -9,20 +11,32 @@ import aiosqlite
 
 
 class Store:
-    def __init__(self, path: Path):
+    def __init__(self, path: Path, *, turso_url: str = "", turso_token: str = "", transport=None):
         self.path = path
+        self.turso_url, self.turso_token, self.transport = turso_url, turso_token, transport
 
     @asynccontextmanager
     async def db(self):
+        if self.turso_url:
+            from .turso import Connection
+            db = Connection(self.turso_url, self.turso_token, transport=self.transport)
+            try:
+                await db.execute("PRAGMA foreign_keys=ON")
+                yield db
+            finally:
+                await db.close()
+            return
         async with aiosqlite.connect(self.path, timeout=15) as db:
             db.row_factory = aiosqlite.Row
             await db.execute("PRAGMA foreign_keys=ON")
             yield db
 
     async def initialize(self):
-        self.path.parent.mkdir(parents=True, exist_ok=True)
+        if not self.turso_url:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
         async with self.db() as db:
-            await db.execute("PRAGMA journal_mode=WAL")
+            if not self.turso_url:
+                await db.execute("PRAGMA journal_mode=WAL")
             await db.executescript("""
                 CREATE TABLE IF NOT EXISTS sessions (
                     id TEXT PRIMARY KEY, owner TEXT NOT NULL, title TEXT NOT NULL,
@@ -34,6 +48,7 @@ class Store:
                 CREATE TABLE IF NOT EXISTS messages (
                     id INTEGER PRIMARY KEY, session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
                     role TEXT NOT NULL CHECK(role IN ('user','assistant')), content TEXT NOT NULL,
+                    metadata TEXT NOT NULL DEFAULT '{}',
                     created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
                 );
                 CREATE INDEX IF NOT EXISTS messages_session ON messages(session_id, id);
@@ -48,11 +63,48 @@ class Store:
                 );
                 CREATE INDEX IF NOT EXISTS memories_owner ON memories(owner);
                 CREATE TABLE IF NOT EXISTS runtime (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+                CREATE TABLE IF NOT EXISTS leases (key TEXT PRIMARY KEY, token TEXT NOT NULL, expires_at INTEGER NOT NULL);
+                CREATE TABLE IF NOT EXISTS rate_limits (key TEXT PRIMARY KEY, window INTEGER NOT NULL, count INTEGER NOT NULL);
             """)
             columns = {row[1] for row in await (await db.execute("PRAGMA table_info(messages)")).fetchall()}
             if "metadata" not in columns:
-                await db.execute("ALTER TABLE messages ADD COLUMN metadata TEXT NOT NULL DEFAULT '{}'")
+                try:
+                    await db.execute("ALTER TABLE messages ADD COLUMN metadata TEXT NOT NULL DEFAULT '{}'")
+                except sqlite3.OperationalError:
+                    columns = {row[1] for row in await (await db.execute("PRAGMA table_info(messages)")).fetchall()}
+                    if "metadata" not in columns:
+                        raise
             await db.commit()
+
+    @asynccontextmanager
+    async def lease(self, key: str, ttl: int):
+        """Cross-instance lock; never keep a database transaction open during AI I/O."""
+        token = str(uuid.uuid4())
+        acquired = False
+        for _ in range(20):
+            async with self.db() as db:
+                cursor = await db.execute("INSERT INTO leases VALUES(?,?,unixepoch()+?) ON CONFLICT(key) DO UPDATE SET token=excluded.token, expires_at=excluded.expires_at WHERE leases.expires_at<unixepoch()", (key, token, ttl))
+                acquired = cursor.rowcount == 1
+                await db.commit()
+            if acquired:
+                break
+            await asyncio.sleep(0.25)
+        if not acquired:
+            raise TimeoutError("Cuộc hội thoại đang xử lý ở phiên khác. Thử lại sau vài giây.")
+        try:
+            yield
+        finally:
+            async with self.db() as db:
+                await db.execute("DELETE FROM leases WHERE key=? AND token=?", (key, token))
+                await db.commit()
+
+    async def allow_request(self, key: str, limit: int = 12) -> bool:
+        async with self.db() as db:
+            cursor = await db.execute("INSERT INTO rate_limits VALUES(?,unixepoch()/60,1) ON CONFLICT(key) DO UPDATE SET window=excluded.window, count=CASE WHEN rate_limits.window=excluded.window THEN rate_limits.count+1 ELSE 1 END RETURNING count", (key,))
+            count = (await cursor.fetchone())[0]
+            await db.execute("DELETE FROM rate_limits WHERE window < unixepoch()/60-2")
+            await db.commit()
+        return count <= limit
 
     async def sessions(self, owner: str) -> list[dict]:
         async with self.db() as db:

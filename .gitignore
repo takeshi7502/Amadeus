@@ -1,4 +1,8 @@
 .local/
+.vercel/
+.agents/
+skills-lock.json
+public/
 .cache/
 runtime_assets/
 node_modules/
@@ -31,3 +35,4 @@ data/
 logs/
 dist/
 *.egg-info/
+

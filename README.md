@@ -67,6 +67,10 @@ nằm trong Git hoặc gói phát hành theo yêu cầu tách đồ kiểm thử
 
 ## Hội thoại và tra cứu
 
+Deploy web lên Vercel dùng Turso để lưu dữ liệu bền vững:
+[hướng dẫn Vercel](docs/VERCEL.md). Chạy `python tools/prepare_vercel.py` trước
+khi deploy CLI để đóng gói Live2D và voice; không tải cấu hình/database local lên.
+
 Web có [giọng Nhật thử nghiệm và bong bóng phụ đề Việt](docs/VOICE.md): bấm
 **Bật giọng Nhật** dưới model hoặc **Nghe thử**. Hai sắc thái VOICEVOX Shikoku
 Metan: **ngọt ngào** (mặc định) và **tsundere**, chọn ngay dưới model. Tạo bộ giọng

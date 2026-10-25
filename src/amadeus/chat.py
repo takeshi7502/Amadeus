@@ -6,6 +6,7 @@ import time
 from collections import defaultdict, deque
 from collections.abc import AsyncIterator
 from weakref import WeakValueDictionary
+from contextlib import asynccontextmanager
 
 from .config import Settings
 from .knowledge import KnowledgeBase
@@ -46,7 +47,23 @@ class ChatService:
     def lock(self, sid: str) -> asyncio.Lock:
         return self.locks.setdefault(sid, asyncio.Lock())
 
-    def check_rate(self, owner: str):
+    @asynccontextmanager
+    async def guard(self, sid: str):
+        async with self.lock(sid):
+            if self.store.turso_url:
+                try:
+                    async with self.store.lease("chat:" + sid, int(self.settings.model_timeout) + 90):
+                        yield
+                except TimeoutError as error:
+                    raise ChatError(str(error), 409) from None
+            else:
+                yield
+
+    async def check_rate(self, owner: str):
+        if self.store.turso_url:
+            if not await self.store.allow_request(owner):
+                raise ChatError("Chậm một chút nhé. Mỗi người tối đa 12 lượt mỗi phút.", 429)
+            return
         now = time.monotonic()
         # Keep the limiter bounded even after many short-lived browser sessions.
         if len(self.rate) > 1000:
@@ -68,7 +85,7 @@ class ChatService:
         text = text.strip()
         if not text or len(text) > 6000:
             raise ChatError("Tin nhắn cần từ 1 đến 6000 ký tự.")
-        async with self.lock(sid):
+        async with self.guard(sid):
             session = await self.require_session(owner, sid)
             previous = await self.store.completed(sid, rid)
             if previous:
@@ -77,7 +94,7 @@ class ChatService:
                 yield "delta", {"text": previous["result"]["text"]}
                 yield "done", previous["result"]
                 return
-            self.check_rate(owner)
+            await self.check_rate(owner)
             if not self.model.ready:
                 raise ChatError("Chưa kết nối AI. Điền provider và model trong settings.toml rồi khởi động lại.", 503)
             history = bounded_history(await self.store.messages(sid, limit=24), self.settings.history_chars)

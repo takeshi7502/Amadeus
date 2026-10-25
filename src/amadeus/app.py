@@ -63,20 +63,24 @@ class LoginInput(BaseModel):
 
 def create_app(settings: Settings | None = None, *, model=None) -> FastAPI:
     settings = settings or load_settings()
-    store = Store(settings.data_dir / "amadeus.db")
+    store = Store(settings.data_dir / "amadeus.db", turso_url=settings.turso_url, turso_token=settings.turso_token)
     kb = KnowledgeBase()
 
     @asynccontextmanager
     async def lifespan(app):
         await store.initialize()
-        keyfile = settings.data_dir / "session.key"
-        try:
-            fd = os.open(keyfile, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
-            with os.fdopen(fd, "wb") as file:
-                file.write(secrets.token_bytes(32))
-        except FileExistsError:
-            pass
-        app.state.signing_key = keyfile.read_bytes()
+        if settings.signing_secret:
+            app.state.signing_key = hashlib.sha256(settings.signing_secret.encode()).digest()
+        else:
+            keyfile = settings.data_dir / "session.key"
+            keyfile.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                fd = os.open(keyfile, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+                with os.fdopen(fd, "wb") as file:
+                    file.write(secrets.token_bytes(32))
+            except FileExistsError:
+                pass
+            app.state.signing_key = keyfile.read_bytes()
         if len(app.state.signing_key) < 32:
             raise RuntimeError("data/session.key không hợp lệ; cần ít nhất 32 byte.")
         app.state.model = model or ModelClient(settings)
@@ -170,7 +174,7 @@ def create_app(settings: Settings | None = None, *, model=None) -> FastAPI:
 
     @app.post("/api/login")
     async def login(body: LoginInput, request: Request):
-        app.state.chat.check_rate("login:" + (request.client.host if request.client else "local"))
+        await app.state.chat.check_rate("login:" + (request.client.host if request.client else "local"))
         if not hmac.compare_digest(body.password.encode(), settings.web_password.encode()):
             raise HTTPException(401, "Mật khẩu chưa đúng.")
         identity = request.state.owner or "web:" + secrets.token_urlsafe(24)
@@ -194,7 +198,7 @@ def create_app(settings: Settings | None = None, *, model=None) -> FastAPI:
 
     @app.delete("/api/sessions/{sid}")
     async def delete_session(sid: UUID, identity=Depends(owner)):
-        async with app.state.chat.lock(str(sid)):
+        async with app.state.chat.guard(str(sid)):
             await app.state.chat.require_session(identity, str(sid))
             await store.delete_session(identity, str(sid))
         return {"ok": True}
@@ -248,8 +252,9 @@ def create_app(settings: Settings | None = None, *, model=None) -> FastAPI:
         return [kb.public_entry(e) for e in entries]
 
     app.mount("/assets", StaticFiles(directory=STATIC), name="assets")
-    settings.assets_dir.mkdir(parents=True, exist_ok=True)
-    app.mount("/runtime", StaticFiles(directory=settings.assets_dir), name="runtime")
+    if not settings.serverless:
+        settings.assets_dir.mkdir(parents=True, exist_ok=True)
+        app.mount("/runtime", StaticFiles(directory=settings.assets_dir), name="runtime")
 
     @app.get("/")
     async def index():
