@@ -2,6 +2,12 @@
   "name": "amadeus-assets",
   "private": true,
   "type": "module",
-  "scripts": {"assets": "python tools/prepare_assets.py"},
-  "devDependencies": {"esbuild": "0.25.12"}
+  "scripts": {
+    "assets": "python tools/prepare_assets.py",
+    "assets:markdown": "node tools/prepare_markdown.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12",
+    "markdown-it": "15.0.3"
+  }
 }

@@ -75,6 +75,7 @@ function message(role, text, pending = false, knowledge = [], sources = []) {
   const main = element('div', 'message-main');
   main.append(element('div', 'message-label', role === 'assistant' ? 'MAKISE KURISU' : 'CẬU'));
   const body = element('div', 'message-body', text);
+  if (role === 'assistant') window.AmadeusMarkdown.render(body, text);
   main.append(body);
   if (role === 'assistant' && !pending) addMessageActions(main, text, knowledge, sources);
   article.append(main);
@@ -280,14 +281,14 @@ async function send(retry = false) {
         if (event === 'delta') {
           if (!answer) document.dispatchEvent(new CustomEvent('amadeus:state', {detail: 'speaking'}));
           answer += payload.text;
-          assistant.body.textContent = answer;
+          window.AmadeusMarkdown.stream(assistant.body, answer);
           scrollDown();
         }
         if (event === 'done') {
           answer = payload.text;
           context = payload.knowledge || context;
           sources = payload.sources || [];
-          assistant.body.textContent = answer;
+          window.AmadeusMarkdown.render(assistant.body, answer);
           done = true;
         }
       }

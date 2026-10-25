@@ -67,3 +67,8 @@ những phần nội dung được chuyển thể từ nguồn này tiếp tục
 Giấy phép mã nguồn AGPL không thay thế quyền đối với nhân vật hoặc nội dung
 của nguồn tham chiếu. Trang giới thiệu Spike Chunsoft chỉ hỗ trợ thông tin
 tổng quan về tác phẩm, không phải nguồn cho tất cả chi tiết từng route.
+
+Giao diện dùng [markdown-it](https://github.com/markdown-it/markdown-it) 15.0.3
+để hiển thị Markdown trong câu trả lời AI. Thư viện và giấy phép của các thành
+phần được đóng gói tại `src/amadeus/static/vendor/`; có thể tạo lại bằng
+`npm run assets:markdown`. HTML từ câu trả lời bị vô hiệu hóa trong parser.
