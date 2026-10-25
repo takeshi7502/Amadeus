@@ -6,6 +6,7 @@ import hashlib
 import hmac
 import json
 import logging
+import mimetypes
 import os
 import secrets
 from contextlib import asynccontextmanager
@@ -27,6 +28,11 @@ from .storage import Store
 
 STATIC = Path(__file__).parent / "static"
 log = logging.getLogger("amadeus")
+
+# Minimal Linux runtimes may lack these entries in their system MIME database.
+# FileResponse must identify these assets correctly even on the API fallback.
+mimetypes.add_type("image/webp", ".webp")
+mimetypes.add_type("font/ttf", ".ttf")
 
 
 class NewSession(BaseModel):
@@ -254,7 +260,9 @@ def create_app(settings: Settings | None = None, *, model=None) -> FastAPI:
     app.mount("/assets", StaticFiles(directory=STATIC), name="assets")
     if not settings.serverless:
         settings.assets_dir.mkdir(parents=True, exist_ok=True)
-        app.mount("/runtime", StaticFiles(directory=settings.assets_dir), name="runtime")
+    # Keep a source-backed route as well as public/ CDN output. A clean Git
+    # deployment must still serve runtime assets if CDN promotion is unavailable.
+    app.mount("/runtime", StaticFiles(directory=settings.assets_dir, check_dir=not settings.serverless), name="runtime")
 
     @app.get("/")
     async def index():

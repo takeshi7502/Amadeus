@@ -42,38 +42,41 @@ Vercel bỏ qua cấu hình local `settings.toml`; AI endpoint phải truy cập
 từ Internet. Endpoint `localhost`, Ollama chỉ chạy trong LAN hoặc proxy chỉ
 truy cập từ máy cá nhân sẽ không chạy được trên Vercel.
 
-## 2. Chuẩn bị file public và deploy qua CLI
+## 2. Build tài nguyên và deploy
 
-Bộ model/voice cần có trên máy như bản local đang chạy:
+Bộ tài nguyên web cần thiết nằm trong `assets/runtime/` và được lưu trong Git:
+logo, font, model/SDK Live2D, giấy phép và các clip giọng Nhật đang sử dụng.
+`assets/runtime-manifest.json` kiểm tra SHA-256 của từng file.
+
+Vercel chạy `python tools/prepare_vercel.py` qua `buildCommand` trong
+`vercel.json` ở mỗi lần deploy, tạo `public/` để CDN phục vụ giao diện và tài
+nguyên. Build không tải thêm model, chạy VOICEVOX, ffmpeg hay cần GPU. Nếu thiếu
+file hoặc checksum sai, build dừng thay vì phát hành một trang thiếu tài nguyên.
+
+Có thể deploy từ repository Git đã commit đủ `assets/` và công cụ build, hoặc
+qua CLI:
 
 ```powershell
-# Nếu chưa chuẩn bị tài nguyên:
-npm ci
-python tools/prepare_assets.py
-powershell -File tools/setup_anime_voice.ps1
-
-# Mỗi lần sửa frontend hoặc đổi bộ voice:
 python tools/prepare_vercel.py
-
-# Chọn đúng workspace/project ở lần đầu:
 npx vercel link --project amadeus --scope <workspace> --yes
 npx vercel deploy --dry --json
 npx vercel deploy --prod --verify
 ```
 
-`public/` được tạo từ source, model/font/vendor đã chuẩn bị và chỉ các MP3
-đang được manifest sử dụng; bản hiện tại khoảng 5 MiB. Nó được Git bỏ qua nhưng
-**được đưa vào gói Vercel CLI**. `.vercelignore` loại cấu hình bí mật, database,
-cache hàng trăm MB, công cụ tạo giọng, node_modules và file test local.
-Không cần VOICEVOX, ffmpeg hoặc một GPU ở runtime trên Vercel.
+`public/` là đầu ra build và bị Git bỏ qua; máy build tự tạo lại nó từ source
+ở mỗi lần deploy. API cũng có đường dẫn phục vụ `assets/runtime/` để các file
+vẫn truy cập được nếu CDN chưa nhận đầu ra build. `.vercelignore` vẫn loại cấu hình bí
+mật, database, cache, công cụ tạo giọng và file test local.
 
-Luồng này deploy **qua CLI từ máy đã chuẩn bị tài nguyên**. Chỉ import repository
-GitHub trên Vercel mà không chuẩn bị `public/` sẽ thiếu model/voice. Nếu muốn
-deploy tự động từ Git, cần bước CI chuẩn bị/khôi phục đúng gói tài nguyên trước
-khi chạy Vercel CLI; không commit cache tạo giọng hoặc thông tin bí mật.
-Project hiện đã ngắt auto deploy từ Git để một lần push chưa có gói tài nguyên
-không ghi đè bản production đang chạy. Cập nhật bằng hai bước chuẩn bị `public/`
-và `vercel deploy --prod` ở trên.
+Chỉ khi chủ động cập nhật model/giọng từ bộ đã tạo trên máy, chạy:
+
+```powershell
+python tools/prepare_vercel.py --refresh-runtime
+```
+
+Review rồi commit các thay đổi trong `assets/runtime/` và manifest cùng nhau.
+Không commit `.cache/`, engine VOICEVOX, `runtime_assets/`, API key hay lịch sử
+người dùng. Xem thêm [assets/README.md](../assets/README.md).
 
 ## 3. Kiểm tra sau deploy
 

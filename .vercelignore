@@ -24,7 +24,8 @@ dist/
 build/
 *.egg-info/
 docs/
-tools/
+tools/*
+!tools/prepare_vercel.py
 scripts/
 Dockerfile
 compose.yaml

@@ -1,0 +1,2 @@
+# Runtime checksums cover exact bytes, including SDK/model JSON and licenses.
+assets/runtime/** -text

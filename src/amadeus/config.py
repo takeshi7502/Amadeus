@@ -95,7 +95,7 @@ def load_settings(path: Path | None = None) -> Settings:
             "api_key_env": "AMADEUS_API_KEY", "type": os.environ.get("AMADEUS_API_TYPE", "chat_completions")}}
     if serverless:
         values.update(serverless=True, secure_cookie=True, telegram_enabled=False)
-        values.setdefault("assets_dir", ROOT / "public/runtime")
+        values.setdefault("assets_dir", ROOT / "assets/runtime")
         # Vercel routes only domains attached to this project. Accept those
         # hostnames without requiring another code/env change for every alias.
         values.setdefault("allowed_hosts", ["*"])
