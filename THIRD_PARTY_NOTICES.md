@@ -60,6 +60,11 @@ Condensed theo SIL Open Font License 1.1, lấy từ Google Fonts. Nguồn và c
 từng file trong `tools/assets.lock.json`. File tải/bundle ở `runtime_assets/`
 được Git bỏ qua, không nằm trong wheel/sdist của mã ứng dụng.
 
+Nội dung chat và ô nhập dùng **IBM Plex Sans** của IBM, theo SIL Open Font
+License 1.1. Bản variable font hỗ trợ tiếng Việt được lưu trong
+`assets/runtime/fonts/`, giấy phép tại `assets/runtime/licenses/ibm-plex-sans.txt`.
+Nguồn Google Fonts được ghim revision và checksum trong `tools/assets.lock.json`.
+
 `canon.json` chứa bản tóm tắt ngắn viết lại bằng tiếng Việt, có liên kết
 nguồn tham chiếu và phân biệt dữ kiện với diễn giải tính cách. Nguồn Wikipedia
 được ghi nhận theo [CC BY-SA](https://creativecommons.org/licenses/by-sa/4.0/);

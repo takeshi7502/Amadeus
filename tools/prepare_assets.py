@@ -23,6 +23,7 @@ REVISION = "eb95bd52fcac76d90109c2f3c4bd2c915be09d98"
 FRAMEWORK = "01e64ba44fc29e5e7206f0c397ee532edf824ee9"
 FAN = f"https://raw.githubusercontent.com/JulienQ1/AmadeusMobile/{REVISION}/"
 CORE = "https://raw.githubusercontent.com/Open-LLM-VTuber/Open-LLM-VTuber-Web/d176e7df2366952e3bacbf12cf9a8b18a4315932/src/renderer/WebSDK/Core/"
+CHAT_FONT = "https://raw.githubusercontent.com/google/fonts/0b58fb370093f9a9f4ff785d94405710b79de67c/ofl/ibmplexsans/"
 FILES = {
     "branding/logo.webp": FAN + "web/public/img/logo.webp",
     "licenses/amadeus-model.txt": FAN + "LICENSE",
@@ -31,6 +32,8 @@ FILES = {
     "fonts/BeVietnamPro-Regular.ttf": "https://raw.githubusercontent.com/google/fonts/main/ofl/bevietnampro/BeVietnamPro-Regular.ttf",
     "fonts/BeVietnamPro-Medium.ttf": "https://raw.githubusercontent.com/google/fonts/main/ofl/bevietnampro/BeVietnamPro-Medium.ttf",
     "fonts/BarlowCondensed-Medium.ttf": "https://raw.githubusercontent.com/google/fonts/main/ofl/barlowcondensed/BarlowCondensed-Medium.ttf",
+    "fonts/IBMPlexSans-Variable.ttf": CHAT_FONT + "IBMPlexSans%5Bwdth%2Cwght%5D.ttf",
+    "licenses/ibm-plex-sans.txt": CHAT_FONT + "OFL.txt",
     "licenses/be-vietnam-pro.txt": "https://raw.githubusercontent.com/google/fonts/main/ofl/bevietnampro/OFL.txt",
     "licenses/barlow-condensed.txt": "https://raw.githubusercontent.com/google/fonts/main/ofl/barlowcondensed/OFL.txt",
     "vendor/live2dcubismcore.min.js": CORE + "live2dcubismcore.min.js",

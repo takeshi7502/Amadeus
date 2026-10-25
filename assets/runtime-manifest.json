@@ -3,6 +3,7 @@
   "fonts/BarlowCondensed-Medium.ttf": "262bd143292ce479ee0cd09a42b47ab173fca8e9c6eb5ed0b5c8a845bc371d17",
   "fonts/BeVietnamPro-Medium.ttf": "b60832bfa0fcd015158112c64d7e3fdad3b0c6287d1823f85a3103636e845268",
   "fonts/BeVietnamPro-Regular.ttf": "cd1ef6e9d7db28ad5cdb88a65ccbe693870e60d340b791f349d248342b4fe4c3",
+  "fonts/IBMPlexSans-Variable.ttf": "3b031aa4216174205bd8471f88a49b91f093169e9e87bd5262242bc5967fe2e3",
   "kurisu/kurisu.cdi3.json": "2d19dd235fb8cb26d1b582f9b6f0cb8aa33f61ebe0a7ec0d14d0f27bb25a93b9",
   "kurisu/kurisu.moc3": "774b5e5916671de0380d3c047485a78bb494bd1601e188858184979005e0c81a",
   "kurisu/kurisu.model3.json": "a992409f25ba5e885fe1332e2128da0b92ed74afc094a135eec1847af9a21803",
@@ -13,8 +14,10 @@
   "licenses/be-vietnam-pro.txt": "6b7f8f73609a25ea78c891e34cf37b06f8a676b7ea986e941e43b009110f2a85",
   "licenses/cubism-core.md": "b81e37048010ef1d336106151201a0323c3309cae44aecdedf57831fe88fa991",
   "licenses/cubism-framework.md": "7ed849bff1e6499aa7cd882e47d246ddbbe06817c1e84cb974df949488302614",
+  "licenses/ibm-plex-sans.txt": "7e6b2818edbd8f6a01ae80641cc8f16a51080d08fb4e532be3a0b6f74adb07da",
   "vendor/cubism.js": "0f806db2c851d0b91d4c93e0d9756b3e9ec5ad6eb146c65e43a52b4a0604e14c",
   "vendor/live2dcubismcore.min.js": "942783587666a3a1bddea93afd349e26f798ed19dcd7a52449d0ae3322fcff7c",
+  "voice/VOICEVOX-TERMS.txt": "57fc18afeebc8a08c303b2b4e3f05bf6453a37c482d17c04ec3fbc674e5fc5f4",
   "voice/bank.json": "15a303d86ed9215b0f3737fcda4f3f4f8a8a03d70102269602ce585979fc9e19",
   "voice/metan-sweet-hello-f4f216fc11f4.mp3": "3f2f173b26a5641b1e4d42a0f41f28e273a3741cfbc562bf6d9d1b5bebc6a62a",
   "voice/metan-sweet-identity-9408f4f820c2.mp3": "f4dc2a28ffdeefe69555488f4a40827104b9f71eea24fa0fd4a0069c53adcb00",
@@ -55,6 +58,5 @@
   "voice/metan-tsun-tired-ede80eacd0d6.mp3": "c468ab9af6068f7cc19e74c3408fa434dc2916487ff78e0dcc4897b7cdfcb21e",
   "voice/metan-tsun-touch-one-39c3571585d3.mp3": "ab0d9a77df864bb35b44cba6fa5c48fc7ed5e8084b8146616d9cae575f09a5fb",
   "voice/metan-tsun-touch-two-1862a8a9c6a5.mp3": "0de80d1718486ebdae1d4f26e6c7e6cf7b50b1f6e04690bc4bf06345c2a91973",
-  "voice/metan-tsun-welcome-5eb9ad5bd5dd.mp3": "638da10676af87a74d022a279ac29cccf5be04f43eb645015418b5410f899780",
-  "voice/VOICEVOX-TERMS.txt": "57fc18afeebc8a08c303b2b4e3f05bf6453a37c482d17c04ec3fbc674e5fc5f4"
+  "voice/metan-tsun-welcome-5eb9ad5bd5dd.mp3": "638da10676af87a74d022a279ac29cccf5be04f43eb645015418b5410f899780"
 }
