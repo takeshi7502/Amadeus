@@ -28,6 +28,22 @@ tương ứng. Đây là dự án fan độc lập, không được chứng th�
 Nitroplus hay Spike Chunsoft. Không bao gồm kịch bản, nhạc, giọng lồng tiếng
 hoặc ảnh cắt từ trò chơi/anime. Các đoạn ví dụ tiếng Việt được viết mới.
 
+Giọng anime hiện tại: **VOICEVOX:四国めたん** (Shikoku Metan), style あまあま
+(0) và ツンツン (6). [Điều khoản thư viện giọng](https://zunko.jp/con_ongen_kiyaku.html).
+Tạo trên máy bằng [VOICEVOX CORE](https://github.com/VOICEVOX/voicevox_core) 0.17.1
+(MIT), model VVM 0.17.0 và VOICEVOX ONNX Runtime 1.17.3 có điều khoản riêng.
+Các file ở `.cache/voicevox/core/` giữ giấy phép/điều khoản tương ứng. Khi chia sẻ
+âm thanh, giữ ghi công VOICEVOX:四国めたん và tuân thủ điều khoản thư viện giọng;
+AGPL không thay thế quyền đối với các model/âm thanh này.
+
+Công cụ giọng cũ (tùy chọn) dùng Nanami (`ja-JP-NanamiNeural`) được tạo qua
+[edge-tts](https://github.com/rany2/edge-tts) (thư viện Python theo LGPL v3),
+sử dụng dịch vụ TTS trực tuyến của Microsoft Edge. Không dùng bản ghi lồng tiếng
+gốc hoặc mô hình clone giọng Kurisu/diễn viên. Các câu Nhật và bản dịch Việt
+trong `voice-lines.json` được viết riêng cho ứng dụng. MP3 tạo ra là tài nguyên
+runtime riêng, không nằm trong giấy phép mã AGPL; giấy phép thư viện không
+thay thế các điều khoản của dịch vụ tạo giọng. Xem [docs/VOICE.md](docs/VOICE.md).
+
 Model Kurisu Live2D và logo fan theo thiết kế Amadeus được tải riêng từ
 [RealAmadeus — DSUV / ELVELT](https://github.com/dsuv-sg/RealAmadeus), qua bản web
 [AmadeusMobile — JulienQ1](https://github.com/JulienQ1/AmadeusMobile), theo

@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "voice": "ja-JP-NanamiNeural",
+  "rate": "+6%",
+  "pitch": "+0Hz",
+  "label": "Nanami · giọng nữ Nhật tổng hợp",
+  "lines": [
+    {"id":"welcome","group":"welcome","ja":"接続できたわ。今日は何を話す？","vi":"Kết nối rồi. Hôm nay cậu muốn nói chuyện gì?"},
+    {"id":"hello","group":"greeting","ja":"こんにちは。ちゃんと聞こえてるわよ。","vi":"Chào cậu. Tôi vẫn đang nghe rõ đây."},
+    {"id":"thanks","group":"thanks","ja":"どういたしまして。少しでも役に立てたなら、よかった。","vi":"Không có gì. Giúp được cậu một chút là tốt rồi."},
+    {"id":"tired","group":"comfort","ja":"無理しすぎないで。少し休んでから、一緒に考えましょう。","vi":"Đừng cố quá. Nghỉ một chút rồi cùng tôi nghĩ tiếp nhé."},
+    {"id":"science","group":"science","ja":"面白い仮説ね。でも、まずは証拠を確かめましょう。","vi":"Giả thuyết thú vị đấy. Nhưng trước hết phải kiểm tra bằng chứng đã."},
+    {"id":"study","group":"study","ja":"一度に全部できなくてもいい。一つずつ、確かめていきましょう。","vi":"Không cần làm được tất cả ngay đâu. Mình cứ kiểm tra từng bước một."},
+    {"id":"tease","group":"tease","ja":"クリスティーナじゃない。紅莉栖よ。何度言えばわかるの？","vi":"Không phải Christina. Là Kurisu. Phải nhắc cậu bao nhiêu lần nữa đây?"},
+    {"id":"praise","group":"praise","ja":"そ、そういうことを急に言わないで。調子が狂うじゃない。","vi":"Đ-đừng đột nhiên nói như thế. Làm tôi mất tự nhiên đấy."},
+    {"id":"okabe","group":"okabe","ja":"岡部のこと？まったく、あの人は本当に変わってるわね。","vi":"Cậu nói Okabe à? Thật tình, người đó đúng là kỳ lạ."},
+    {"id":"identity","group":"identity","ja":"私はアマデウス。紅莉栖って呼んでくれていいわ。","vi":"Tôi là Amadeus. Cứ gọi tôi là Kurisu cũng được."},
+    {"id":"night","group":"night","ja":"おやすみ。ちゃんと休むのも大切なことよ。","vi":"Ngủ ngon. Nghỉ ngơi đàng hoàng cũng quan trọng đấy."},
+    {"id":"reply-one","group":"reply","ja":"私の考えは、こんなところね。あなたはどう思う？","vi":"Đó là suy nghĩ của tôi. Còn cậu thấy sao?"},
+    {"id":"reply-two","group":"reply","ja":"ねえ、気になるところがあったら、遠慮せずに聞いて。","vi":"Này, có chỗ nào cậu còn thắc mắc thì cứ hỏi đi."},
+    {"id":"reply-three","group":"reply","ja":"一緒に整理していけば、きっと見えてくるものがあるわ。","vi":"Cùng sắp xếp lại từng ý, chắc chắn sẽ có điều sáng tỏ hơn."},
+    {"id":"idle-one","group":"idle","ja":"何か考え事？話したくなったら、聞くわよ。","vi":"Cậu đang suy nghĩ gì à? Khi nào muốn kể thì tôi nghe."},
+    {"id":"idle-two","group":"idle","ja":"少し目を休めたら？画面を見つめすぎるのもよくないわ。","vi":"Cho mắt nghỉ một chút đi? Nhìn màn hình mãi cũng không tốt đâu."},
+    {"id":"idle-three","group":"idle","ja":"静かね。こういう時間も、悪くないかも。","vi":"Yên tĩnh thật. Một khoảng thời gian như thế này cũng không tệ."},
+    {"id":"idle-four","group":"idle","ja":"時間って、不思議よね。考え始めると、きりがないわ。","vi":"Thời gian kỳ lạ thật nhỉ. Nghĩ về nó rồi thì khó mà dừng lại."},
+    {"id":"touch-one","group":"touch","ja":"な、何？急にこっちを見ないでよ。","vi":"G-gì vậy? Đừng đột nhiên nhìn tôi như thế chứ."},
+    {"id":"touch-two","group":"touch","ja":"聞こえてるわ。そんなに何度も呼ばなくても。","vi":"Tôi nghe mà. Cậu không cần gọi đi gọi lại đâu."}
+  ]
+}

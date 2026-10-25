@@ -7,9 +7,10 @@
   <meta name="description" content="Amadeus — trò chuyện với một bản mô phỏng Makise Kurisu từ Steins;Gate.">
   <title>Amadeus · Makise Kurisu</title>
   <link rel="icon" type="image/webp" href="/runtime/branding/logo.webp">
-  <link rel="stylesheet" href="/assets/style.css?v=20261025-sessions5">
-  <script src="/assets/app.js?v=20261025-sessions5" defer></script>
-  <script src="/assets/avatar.js" type="module"></script>
+  <link rel="stylesheet" href="/assets/style.css?v=20261025-animevoice2">
+  <script src="/assets/app.js?v=20261025-animevoice2" defer></script>
+  <script src="/assets/voice.js?v=20261025-animevoice2" defer></script>
+  <script src="/assets/avatar.js?v=20261025-voice1" type="module"></script>
 </head>
 <body>
 <div class="app-shell">
@@ -73,7 +74,13 @@
 
   <aside class="character-panel" id="character-panel" aria-label="Kết nối hình ảnh với Kurisu">
     <div class="connection"><span id="connection-dot"></span><span id="connection-text">ĐANG KẾT NỐI</span><span class="signal" aria-hidden="true">▂▄▆</span><button id="close-avatar" class="icon-button avatar-toggle" aria-label="Đóng khung nhân vật">×</button></div>
-    <div class="avatar-stage" id="avatar-container" data-state="loading"><div class="portrait-grid"></div><div class="stage-corner top-left"></div><div class="stage-corner bottom-right"></div><span class="portrait-coordinate">AMADEUS<br>VISUAL CONNECTION</span><canvas id="kurisu-canvas" aria-label="Model Live2D của Makise Kurisu" role="img" hidden></canvas><div id="avatar-fallback"><img src="/runtime/branding/logo.webp" alt="Amadeus"><p>Đang khởi tạo kết nối hình ảnh…</p></div><div class="portrait-caption"><span id="avatar-status">INITIALIZING LIVE2D</span><span>004</span></div></div>
+    <div class="avatar-stage" id="avatar-container" data-state="loading"><div class="portrait-grid"></div><div class="stage-corner top-left"></div><div class="stage-corner bottom-right"></div><span class="portrait-coordinate">AMADEUS<br>VISUAL CONNECTION</span><canvas id="kurisu-canvas" aria-label="Model Live2D của Makise Kurisu" role="img" hidden></canvas><div id="avatar-fallback"><img src="/runtime/branding/logo.webp" alt="Amadeus"><p>Đang khởi tạo kết nối hình ảnh…</p></div><div class="voice-bubble" id="voice-bubble" hidden><div class="voice-bubble-heading"><span>MAKISE KURISU <i aria-hidden="true">▂▄▆</i></span><button id="voice-stop" type="button" aria-label="Dừng giọng nói" title="Dừng giọng nói">×</button></div><p id="voice-subtitle" role="status" aria-live="polite" aria-atomic="true"></p></div><div class="portrait-caption"><span id="avatar-status">INITIALIZING LIVE2D</span><span>004</span></div></div>
+    <div class="voice-controls" aria-label="Giọng nói Kurisu">
+      <audio id="kurisu-audio" preload="none" hidden></audio>
+      <div class="voice-buttons"><button id="voice-toggle" type="button" aria-pressed="false" disabled><svg aria-hidden="true"><use href="/assets/icons.svg#speaker"/></svg><span id="voice-toggle-label">Bật giọng Nhật</span></button><button id="voice-preview" type="button" title="Nghe một câu ngẫu nhiên" disabled>Nghe thử <span aria-hidden="true">▷</span></button></div>
+      <div class="voice-choice" id="voice-choice" hidden><label class="sr-only" for="voice-profile">Chọn giọng anime</label><select id="voice-profile" disabled></select></div>
+      <details class="voice-settings"><summary id="voice-status">Đang chuẩn bị giọng nói…</summary><div><label for="voice-volume">Âm lượng <input id="voice-volume" type="range" min="0" max="100" value="65"></label><label class="voice-idle"><input id="voice-ambient" type="checkbox" checked>Thỉnh thoảng trò chuyện</label><p>Giọng nhân vật anime tổng hợp. Phản ứng ngắn theo chat, kèm phụ đề Việt.</p><small id="voice-credit" hidden></small></div></details>
+    </div>
     <div class="character-info"><div class="section-label">MEMORY SUBJECT / 004</div><h2>MAKISE <em>KURISU</em></h2><span class="japanese-name">牧瀬 紅莉栖</span><div class="character-tags"><span>Neuroscience</span><span>Amadeus AI</span></div><p>“Cứ nói đi. Tôi đang nghe.”</p></div>
     <div class="archive-card"><span class="archive-icon">⌘</span><div><strong>MEMORY. PERSONALITY. PRESENCE.</strong><p>Một bản ký ức.<br>Một cuộc trò chuyện đang tiếp diễn.</p></div></div>
     <div class="panel-footer"><span>LIVE2D: DSUV / ELVELT</span><span>FAN / NON-COMMERCIAL</span></div>
@@ -105,6 +112,7 @@
   <p class="dialog-description">Đây là giao diện trò chuyện nhập vai bằng AI. Kurisu duy trì điểm nhìn của Amadeus trong thế giới Steins;Gate; thông tin kỹ thuật của ứng dụng được trình bày ở đây, tách khỏi lời nhân vật.</p>
   <p class="dialog-description">Model Live2D và logo: <a href="https://github.com/dsuv-sg/RealAmadeus" target="_blank" rel="noopener noreferrer">DSUV / ELVELT — RealAmadeus</a>. Bản tài nguyên tối ưu cho web: <a href="https://github.com/JulienQ1/AmadeusMobile" target="_blank" rel="noopener noreferrer">JulienQ1</a>. <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener noreferrer">CC BY-NC 4.0</a>, phi thương mại; không phải tài nguyên chính thức được MAGES. chứng thực.</p>
   <p class="dialog-description">Live2D Cubism © Live2D Inc.; Be Vietnam Pro và Barlow Condensed theo SIL Open Font License. Steins;Gate / nhân vật © các chủ sở hữu tương ứng. Mã ứng dụng theo AGPL v3; các tài nguyên trên giữ giấy phép riêng.</p>
+  <p class="dialog-description">Giọng anime: <strong>VOICEVOX:四国めたん</strong> (Shikoku Metan), hai sắc thái ngọt ngào và tsundere. Chọn giọng ngay dưới model; lựa chọn được nhớ trong trình duyệt. <a href="https://zunko.jp/con_ongen_kiyaku.html" target="_blank" rel="noopener noreferrer">Nguồn và điều khoản giọng</a>. Đây là giọng nhân vật tổng hợp, chưa phải giọng Kurisu gốc. Các câu ngắn được tạo trên máy và phát từ máy chủ dự án. Phụ đề Việt là bản dịch của câu đang phát; bản thử phản ứng theo chủ đề, chưa đọc toàn bộ câu trả lời AI. Bật giọng một lần mỗi lần mở trang; có thể tắt nói lúc rảnh và chỉnh âm lượng ngay dưới model.</p>
 </dialog>
 <div id="toast" role="status" hidden></div>
 </body>

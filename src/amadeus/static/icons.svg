@@ -6,4 +6,5 @@
 <symbol id="person" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-3a8 8 0 0 1 16 0v3"/></symbol>
 <symbol id="send" viewBox="0 0 24 24"><path d="m6 11 6-6 6 6M12 5v15"/></symbol>
 <symbol id="search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
+<symbol id="speaker" viewBox="0 0 24 24"><path d="m11 4-6 5H2v6h3l6 5V4m4 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></symbol>
 </defs></svg>

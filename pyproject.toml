@@ -34,3 +34,8 @@ asyncio_mode = "auto"
 
 [project.scripts]
 amadeus = "amadeus.__main__:main"
+
+[project.optional-dependencies]
+voice = [
+    "edge-tts>=7.2,<8",
+]

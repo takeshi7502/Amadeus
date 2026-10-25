@@ -51,6 +51,7 @@ function updateControls() {
 }
 async function navigate(action) {
   if (state.busy || state.navigating) return;
+  document.dispatchEvent(new CustomEvent('amadeus:navigate'));
   state.navigating = true;
   updateControls();
   try { return await action(); }
@@ -305,6 +306,7 @@ async function send(retry = false) {
     $('input').value = request.text;
   } finally {
     setBusy(false);
+    if (done) document.dispatchEvent(new CustomEvent('amadeus:reply', {detail: {userText: request.text}}));
     state.controller = null;
     $('input').focus();
     scrollDown();

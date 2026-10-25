@@ -67,6 +67,12 @@ nằm trong Git hoặc gói phát hành theo yêu cầu tách đồ kiểm thử
 
 ## Hội thoại và tra cứu
 
+Web có [giọng Nhật thử nghiệm và bong bóng phụ đề Việt](docs/VOICE.md): bấm
+**Bật giọng Nhật** dưới model hoặc **Nghe thử**. Hai sắc thái VOICEVOX Shikoku
+Metan: **ngọt ngào** (mặc định) và **tsundere**, chọn ngay dưới model. Tạo bộ giọng
+bằng `powershell -File tools/setup_anime_voice.ps1`. Mỗi giọng có 20 câu phản ứng
+và lời nói lúc rảnh; chưa phải giọng Kurisu gốc hay đọc toàn bộ chat.
+
 - `amadeus`: snapshot trước chuyến về Nhật; không nhận ký ức Alpha là đã trải qua.
 - `lab`: vẫn là AI Amadeus, bổ sung lớp tham chiếu dữ liệu Kurisu ở lab Alpha.
 - Web nhớ hội thoại gần nhất cho từng chế độ. Đổi chế độ và mở cuộc trò chuyện

@@ -2,8 +2,9 @@
 
 Web hiện dùng **model Live2D Cubism 5 thật**, không còn minh họa SVG cũ.
 Adapter ở `src/amadeus/static/avatar.js` điều khiển mắt, góc đầu, nhịp thở và
-chuyển động miệng nhẹ trong lúc nhận văn bản. Chưa có TTS/giọng nói hay lip sync
-theo âm thanh. Khi không hỗ trợ WebGL, giao diện báo lỗi và hiện logo dự phòng.
+miệng. Bộ giọng Nhật thử nghiệm phát câu ngắn kèm bong bóng tiếng Việt và điều
+khiển miệng theo biên độ âm thanh; xem [cách dùng và thay giọng](VOICE.md).
+Khi không hỗ trợ WebGL, giao diện báo lỗi và hiện logo dự phòng.
 
 ## Bộ model miễn phí đang dùng
 

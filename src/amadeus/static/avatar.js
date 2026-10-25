@@ -8,8 +8,14 @@ let mode = 'idle';
 let frameId = 0;
 let release = () => {};
 let ready = false;
+let voiceSpeaking = false;
+let voiceLevel = 0;
 
 document.addEventListener('amadeus:state', (event) => { mode = event.detail; });
+document.addEventListener('amadeus:voice', (event) => {
+  voiceSpeaking = event.detail.speaking;
+  voiceLevel = Math.max(0, Math.min(1, Number(event.detail.level) || 0));
+});
 
 function loadScript(url) {
   return new Promise((resolve, reject) => {
@@ -130,8 +136,10 @@ async function start() {
     set('ParamAngleY', gazeY * 5); set('ParamAngleZ', moving ? Math.sin(time * 0.43) : 0);
     set('ParamBreath', moving ? 0.45 + Math.sin(time * 1.6) * 0.2 : 0.45);
     set('ParamBodyAngleX', moving ? Math.sin(time * 0.5) * 1.2 : 0);
-    // Text mode has no synthesized voice; this is a visual speaking cue, not audio lip sync.
-    const targetMouth = moving && mode === 'speaking' ? (0.15 + Math.abs(Math.sin(time * 11)) * 0.25) : 0;
+    // Cached Japanese clips drive the mouth from their measured audio amplitude.
+    // Keep the existing gentle text-stream cue when no clip is playing.
+    const targetMouth = voiceSpeaking ? voiceLevel
+      : moving && mode === 'speaking' ? (0.15 + Math.abs(Math.sin(time * 11)) * 0.25) : 0;
     mouth += (targetMouth - mouth) * Math.min(1, dt * 15);
     set('ParamMouthOpenY', mouth);
     if (moving) userModel.updatePhysics(dt);
