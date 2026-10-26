@@ -60,6 +60,12 @@ def main():
     elif assets == (ROOT / "assets/runtime").resolve():
         if not lock.is_file() or json.loads(lock.read_text(encoding="utf-8")) != checksums:
             raise SystemExit("Versioned runtime assets are incomplete or changed. Refresh the runtime bundle before deploying.")
+    static = ROOT / "src/amadeus/static"
+    portraits = json.loads((ROOT / "src/amadeus/resources/character_images.json").read_text(encoding="utf-8"))
+    for portrait in portraits.values():
+        path = (static / portrait["src"].removeprefix("/assets/")).resolve()
+        if not path.is_relative_to(static.resolve()) or not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != portrait["sha256"]:
+            raise SystemExit("Character portrait asset is missing or has changed.")
     # Replace only our known generated asset subdirectories, not arbitrary files.
     for name in ["assets", "runtime"]:
         target = (output / name).resolve()
@@ -68,7 +74,6 @@ def main():
         if target.exists():
             shutil.rmtree(target)
     output.mkdir(parents=True, exist_ok=True)
-    static = ROOT / "src/amadeus/static"
     shutil.copytree(static, output / "assets")
     shutil.copyfile(static / "index.html", output / "index.html")
     for source in needed:

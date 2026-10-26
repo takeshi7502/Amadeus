@@ -1,0 +1,173 @@
+{
+  "okabe-rintaro": {
+    "src": "/assets/characters/okabe-rintaro-sheet.png",
+    "source": "https://steinsgate0-anime.com/#character",
+    "download": "https://steinsgate0-anime.com/wp-content/themes/steinsgate/img/index/img_charabg01.png",
+    "title": "Character artwork — Steins;Gate 0 official TV site",
+    "locator": "Official character expression sheet. The first portrait is framed using CSS; original PNG retained.",
+    "rights": "©2018 MAGES./KADOKAWA/ STEINS;GATE 0 Partners",
+    "sha256": "fed33f909161e55b5cd70ca8abcb05dbaa1b933a6ef22d8ebaac12bc59039c17"
+  },
+  "mayuri-shiina": {
+    "src": "/assets/characters/mayuri-shiina-sheet.png",
+    "source": "https://steinsgate0-anime.com/#character",
+    "download": "https://steinsgate0-anime.com/wp-content/themes/steinsgate/img/index/img_charabg02.png",
+    "title": "Character artwork — Steins;Gate 0 official TV site",
+    "locator": "Official character expression sheet. The first portrait is framed using CSS; original PNG retained.",
+    "rights": "©2018 MAGES./KADOKAWA/ STEINS;GATE 0 Partners",
+    "sha256": "76e041819f425a72696cdad20a3ac65839ab07a1369dd51c468d96a16c4f99e2"
+  },
+  "hashida-itaru": {
+    "src": "/assets/characters/hashida-itaru-sheet.png",
+    "source": "https://steinsgate0-anime.com/#character",
+    "download": "https://steinsgate0-anime.com/wp-content/themes/steinsgate/img/index/img_charabg03.png",
+    "title": "Character artwork — Steins;Gate 0 official TV site",
+    "locator": "Official character expression sheet. The first portrait is framed using CSS; original PNG retained.",
+    "rights": "©2018 MAGES./KADOKAWA/ STEINS;GATE 0 Partners",
+    "sha256": "fd618bde0e17099b749f9ac4eb64ad74ce95b1a4bf8afd6fa16787479082b423"
+  },
+  "kiryu-moeka": {
+    "src": "/assets/characters/kiryu-moeka-sheet.png",
+    "source": "https://steinsgate0-anime.com/#character",
+    "download": "https://steinsgate0-anime.com/wp-content/themes/steinsgate/img/index/img_charabg05.png",
+    "title": "Character artwork — Steins;Gate 0 official TV site",
+    "locator": "Official character expression sheet. The first portrait is framed using CSS; original PNG retained.",
+    "rights": "©2018 MAGES./KADOKAWA/ STEINS;GATE 0 Partners",
+    "sha256": "8417adde8c82e017827d3132acb753b7332b8de9d497ea54b73949445fd5ef50"
+  },
+  "urushibara-luka": {
+    "src": "/assets/characters/urushibara-luka-sheet.png",
+    "source": "https://steinsgate0-anime.com/#character",
+    "download": "https://steinsgate0-anime.com/wp-content/themes/steinsgate/img/index/img_charabg06.png",
+    "title": "Character artwork — Steins;Gate 0 official TV site",
+    "locator": "Official character expression sheet. The first portrait is framed using CSS; original PNG retained.",
+    "rights": "©2018 MAGES./KADOKAWA/ STEINS;GATE 0 Partners",
+    "sha256": "b5cfa32fc1486c7600dd733107ac3bcc9ed811763998575364158e4fd0d55aa0"
+  },
+  "akiha-rumiho": {
+    "src": "/assets/characters/akiha-rumiho-sheet.png",
+    "source": "https://steinsgate0-anime.com/#character",
+    "download": "https://steinsgate0-anime.com/wp-content/themes/steinsgate/img/index/img_charabg07.png",
+    "title": "Character artwork — Steins;Gate 0 official TV site",
+    "locator": "Official character expression sheet. The first portrait is framed using CSS; original PNG retained.",
+    "rights": "©2018 MAGES./KADOKAWA/ STEINS;GATE 0 Partners",
+    "sha256": "774ffc7d2cb4a8050b044038b703fdac7f542d8d0826e89a33a1d02d79a775da"
+  },
+  "amane-suzuha": {
+    "src": "/assets/characters/amane-suzuha-sheet.png",
+    "source": "https://steinsgate0-anime.com/#character",
+    "download": "https://steinsgate0-anime.com/wp-content/themes/steinsgate/img/index/img_charabg08.png",
+    "title": "Character artwork — Steins;Gate 0 official TV site",
+    "locator": "Official character expression sheet. The first portrait is framed using CSS; original PNG retained.",
+    "rights": "©2018 MAGES./KADOKAWA/ STEINS;GATE 0 Partners",
+    "sha256": "93725ba984368de4a5ac7805287e8ec566a509b556e7d452bea5f0588209380b"
+  },
+  "hiyajo-maho": {
+    "src": "/assets/characters/hiyajo-maho-sheet.png",
+    "source": "https://steinsgate0-anime.com/#character",
+    "download": "https://steinsgate0-anime.com/wp-content/themes/steinsgate/img/index/img_charabg09.png",
+    "title": "Character artwork — Steins;Gate 0 official TV site",
+    "locator": "Official character expression sheet. The first portrait is framed using CSS; original PNG retained.",
+    "rights": "©2018 MAGES./KADOKAWA/ STEINS;GATE 0 Partners",
+    "sha256": "c84aef5677b854017de282b5074035bbb6edef2b8dbff769550471c696a82701"
+  },
+  "shiina-kagari": {
+    "src": "/assets/characters/shiina-kagari-sheet.png",
+    "source": "https://steinsgate0-anime.com/#character",
+    "download": "https://steinsgate0-anime.com/wp-content/themes/steinsgate/img/index/img_charabg10_1.png",
+    "title": "Character artwork — Steins;Gate 0 official TV site",
+    "locator": "Official character expression sheet. The first portrait is framed using CSS; original PNG retained.",
+    "rights": "©2018 MAGES./KADOKAWA/ STEINS;GATE 0 Partners",
+    "sha256": "0df8ac6119027bdfae06b0935a830c5ebdf08e7824d0c25f49e38e6021960e08"
+  },
+  "amane-yuki": {
+    "src": "/assets/characters/amane-yuki-sheet.png",
+    "source": "https://steinsgate0-anime.com/#character",
+    "download": "https://steinsgate0-anime.com/wp-content/themes/steinsgate/img/index/img_charabg11.png",
+    "title": "Character artwork — Steins;Gate 0 official TV site",
+    "locator": "Official character expression sheet. The first portrait is framed using CSS; original PNG retained.",
+    "rights": "©2018 MAGES./KADOKAWA/ STEINS;GATE 0 Partners",
+    "sha256": "bc89352cbdff3d8c727dfb80bc087307a00511734ba5568ed2b6afea47205e8f"
+  },
+  "tennouji-nae": {
+    "src": "/assets/characters/tennouji-nae-sheet.png",
+    "source": "https://steinsgate0-anime.com/#character",
+    "download": "https://steinsgate0-anime.com/wp-content/themes/steinsgate/img/index/img_charabg12.png",
+    "title": "Character artwork — Steins;Gate 0 official TV site",
+    "locator": "Official character expression sheet. The first portrait is framed using CSS; original PNG retained.",
+    "rights": "©2018 MAGES./KADOKAWA/ STEINS;GATE 0 Partners",
+    "sha256": "c63413572099f22516bb959a6c9ef0810907c469ecfe8f62545b93c95132bab0"
+  },
+  "nakase-katsumi": {
+    "src": "/assets/characters/nakase-katsumi-sheet.png",
+    "source": "https://steinsgate0-anime.com/#character",
+    "download": "https://steinsgate0-anime.com/wp-content/themes/steinsgate/img/index/img_charabg13.png",
+    "title": "Character artwork — Steins;Gate 0 official TV site",
+    "locator": "Official character expression sheet. The first portrait is framed using CSS; original PNG retained.",
+    "rights": "©2018 MAGES./KADOKAWA/ STEINS;GATE 0 Partners",
+    "sha256": "5bf9052491cd19c547a6514ba2abd8f2a1b5ce60dece85d217886461664be575"
+  },
+  "kurushima-kaede": {
+    "src": "/assets/characters/kurushima-kaede-sheet.png",
+    "source": "https://steinsgate0-anime.com/#character",
+    "download": "https://steinsgate0-anime.com/wp-content/themes/steinsgate/img/index/img_charabg14.png",
+    "title": "Character artwork — Steins;Gate 0 official TV site",
+    "locator": "Official character expression sheet. The first portrait is framed using CSS; original PNG retained.",
+    "rights": "©2018 MAGES./KADOKAWA/ STEINS;GATE 0 Partners",
+    "sha256": "44d397ada239e7fe2736c9a4ccafd5341763a4d180b623a7d3255b98a344452b"
+  },
+  "alexis-leskinen": {
+    "src": "/assets/characters/alexis-leskinen-sheet.png",
+    "source": "https://steinsgate0-anime.com/#character",
+    "download": "https://steinsgate0-anime.com/wp-content/themes/steinsgate/img/index/img_charabg15.png",
+    "title": "Character artwork — Steins;Gate 0 official TV site",
+    "locator": "Official character expression sheet. The first portrait is framed using CSS; original PNG retained.",
+    "rights": "©2018 MAGES./KADOKAWA/ STEINS;GATE 0 Partners",
+    "sha256": "0e0d18a6d63c9b39e67094cdfe37196c65b3d45ef6de37d369f80e1fac735f4e"
+  },
+  "judy-reyes": {
+    "src": "/assets/characters/judy-reyes-sheet.png",
+    "source": "https://steinsgate0-anime.com/#character",
+    "download": "https://steinsgate0-anime.com/wp-content/themes/steinsgate/img/index/img_charabg16.png",
+    "title": "Character artwork — Steins;Gate 0 official TV site",
+    "locator": "Official character expression sheet. The first portrait is framed using CSS; original PNG retained.",
+    "rights": "©2018 MAGES./KADOKAWA/ STEINS;GATE 0 Partners",
+    "sha256": "347c1d79fbb04d68b1976d7546b6c3b9464d419adc1afb26a83eb13aef2bc694"
+  },
+  "tennouji-yugo": {
+    "src": "/assets/characters/tennouji-yugo.png",
+    "source": "https://www.animesc.com/en/details/3ow9CL/steins-gate",
+    "download": "https://cdn.animesc.com/31b2098a6d4e2ed8.avif",
+    "title": "Character image — Animesc anime cast listing",
+    "locator": "Anime cast portrait, visually checked. PNG captured from the rendered 150×225 image; no browser chrome included.",
+    "rights": "Steins;Gate artwork © respective MAGES., Nitroplus and anime rights holders; not AGPL licensed.",
+    "sha256": "c0754f4a3130928e29da99d761a2484c842cc5a2b401bde69575b4275a433e03"
+  },
+  "akiha-yukitaka": {
+    "src": "/assets/characters/akiha-yukitaka.png",
+    "source": "https://www.animesc.com/en/details/3ow9CL/steins-gate",
+    "download": "https://cdn.animesc.com/f3331b714956df45.avif",
+    "title": "Character image — Animesc anime cast listing",
+    "locator": "Anime cast portrait, visually checked. PNG captured from the rendered 150×225 image; no browser chrome included.",
+    "rights": "Steins;Gate artwork © respective MAGES., Nitroplus and anime rights holders; not AGPL licensed.",
+    "sha256": "94d5662663a247d01e3ef8aba0a4a9379839f57afcff77bd5c7a6ff51c2ae65f"
+  },
+  "urushibara-eisuke": {
+    "src": "/assets/characters/urushibara-eisuke.png",
+    "source": "https://www.animesc.com/en/details/3ow9CL/steins-gate",
+    "download": "https://cdn.animesc.com/9736806d3ea92c63.avif",
+    "title": "Character image — Animesc anime cast listing",
+    "locator": "Anime cast portrait, visually checked. PNG captured from the rendered 150×225 image; no browser chrome included.",
+    "rights": "Steins;Gate artwork © respective MAGES., Nitroplus and anime rights holders; not AGPL licensed.",
+    "sha256": "95f4b0195f9574aafec746849dd1c59aa198233dff02d45d7bda36d0cf77979b"
+  },
+  "doctor-nakabachi": {
+    "src": "/assets/characters/doctor-nakabachi.png",
+    "source": "https://www.animesc.com/en/details/3ow9CL/steins-gate",
+    "download": "https://cdn.animesc.com/acfe7b701aea8ef.avif",
+    "title": "Character image — Animesc anime cast listing",
+    "locator": "Anime cast portrait, visually checked. PNG captured from the rendered 150×225 image; no browser chrome included.",
+    "rights": "Steins;Gate artwork © respective MAGES., Nitroplus and anime rights holders; not AGPL licensed.",
+    "sha256": "7beae13a7ea035c4abf42cd65d5b5472dd1ba60f56f55dfb0b2ac5f154a0e92f"
+  }
+}

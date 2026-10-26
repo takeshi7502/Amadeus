@@ -77,3 +77,9 @@ Giao diện dùng [markdown-it](https://github.com/markdown-it/markdown-it) 15.0
 để hiển thị Markdown trong câu trả lời AI. Thư viện và giấy phép của các thành
 phần được đóng gói tại `src/amadeus/static/vendor/`; có thể tạo lại bằng
 `npm run assets:markdown`. HTML từ câu trả lời bị vô hiệu hóa trong parser.
+
+Ảnh nhân vật trong Lab Archives lấy từ trang Steins;Gate 0 TV chính thức và
+các nguồn thứ cấp ghi tại [docs/CHARACTER_IMAGES.md](docs/CHARACTER_IMAGES.md).
+Các file ở `src/amadeus/static/characters/` giữ quyền của chủ sở hữu hình ảnh,
+không thuộc giấy phép AGPL của mã nguồn. Manifest ghi nguồn và checksum tại
+`src/amadeus/resources/character_images.json`.

@@ -65,6 +65,12 @@ class Store:
                 CREATE TABLE IF NOT EXISTS runtime (key TEXT PRIMARY KEY, value TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS leases (key TEXT PRIMARY KEY, token TEXT NOT NULL, expires_at INTEGER NOT NULL);
                 CREATE TABLE IF NOT EXISTS rate_limits (key TEXT PRIMARY KEY, window INTEGER NOT NULL, count INTEGER NOT NULL);
+                CREATE TABLE IF NOT EXISTS archive_pages (
+                    slug TEXT PRIMARY KEY, draft TEXT NOT NULL, published TEXT,
+                    visibility TEXT NOT NULL CHECK(visibility IN ('seed','published','hidden')),
+                    revision INTEGER NOT NULL DEFAULT 0,
+                    updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+                );
             """)
             columns = {row[1] for row in await (await db.execute("PRAGMA table_info(messages)")).fetchall()}
             if "metadata" not in columns:

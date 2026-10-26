@@ -4,6 +4,7 @@
   // Vietnamese is the source locale. Only authored UI is bound: conversation,
   // memory and reference content never passes through automatic translation.
   const english = {
+    'Khám phá Amadeus': 'Explore Amadeus',
     'Không gian lab': 'Lab space', 'Không gian lab.': 'Lab space.',
     'Chọn một cảnh. Bắt đầu một thí nghiệm.': 'Choose a scene. Start an experiment.',
     'Đang lắng nghe': 'Listening', 'Tò mò': 'Curious', 'Dịu dàng': 'Gentle', 'Hơi ngượng': 'A little flustered', 'Hờn nhẹ': 'Slightly annoyed', 'Vui vẻ': 'Happy',

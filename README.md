@@ -1,5 +1,10 @@
 # Amadeus · Makise Kurisu
 
+**Lab Archives:** mở **Khám phá Amadeus** trong sidebar hoặc `/explore` để đọc
+54 hồ sơ VI/EN (24 nhân vật, 11 tổ chức/nhóm), xem world line/46 quan hệ nhân vật và thử phòng nghiên cứu. [Kiểm kê kho anime](docs/ANIME_ROSTER.md).
+Admin có thể biên tập nháp, xem trước và xuất bản tại `/editor`.
+Luồng dữ liệu, bảo mật và vận hành: [docs/ARCHIVES.md](docs/ARCHIVES.md).
+
 Chat AI tiếng Việt trên **web và Telegram**, kế thừa chọn lọc cấu hình/provider
 của waku-bot. Persona duy trì điểm nhìn Amadeus tại Viktor Chondria University:
 AI từ ký ức Kurisu, có Leskinen và Maho trong nhóm phát triển, không tự giới

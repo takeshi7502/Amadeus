@@ -81,3 +81,14 @@ html[lang=en] .pending .message-body:empty:after{content:'Thinking…'}
 @media(max-width:760px){.header-actions{--control-size:32px}.connection #close-avatar{width:44px;height:44px}}
 @media(max-width:600px){.chat-header .header-actions{width:100%;margin-top:0;gap:6px}.chat-header .header-actions select{flex:1;min-width:0;width:0;max-width:none;margin-right:0}.chat-header .header-actions #export{display:none}.chat-header .header-title h1>span{display:none}}
 @media(max-width:600px){.lab-dialog{padding:18px 14px}.lab-toolbar{top:-18px;margin:-18px -14px 16px;padding:14px 14px 10px}.lab-toolbar .tiny-label{font-size:9px;letter-spacing:1px}}
+.sidebar-bottom a.nav-button{text-decoration:none}
+
+/* Shared frame metrics: chat and archives keep the same navigation geometry. */
+:root{--shell-sidebar-width:240px;--shell-header-height:64px;--shell-header-x:24px;--shell-header-y:10px;--shell-header-gap:13px;--shell-control-size:36px}
+.app-shell{grid-template-columns:var(--shell-sidebar-width) minmax(0,1fr) 270px}
+.chat-header{min-height:var(--shell-header-height);padding:var(--shell-header-y) var(--shell-header-x);gap:var(--shell-header-gap)}
+@media(min-width:1700px){:root{--shell-sidebar-width:250px;--shell-header-x:30px}.app-shell{grid-template-columns:var(--shell-sidebar-width) minmax(0,1fr) 288px}}
+@media(max-width:1250px){:root{--shell-sidebar-width:220px;--shell-header-x:18px}.app-shell{grid-template-columns:var(--shell-sidebar-width) minmax(0,1fr) 243px}}
+@media(max-width:1100px){:root{--shell-sidebar-width:230px}.app-shell{grid-template-columns:var(--shell-sidebar-width) minmax(0,1fr)}}
+@media(max-width:760px){:root{--shell-sidebar-width:260px;--shell-header-height:68px;--shell-header-x:12px;--shell-header-y:8px;--shell-header-gap:4px;--shell-control-size:32px}.app-shell{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:420px){:root{--shell-header-height:90px}}

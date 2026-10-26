@@ -16,6 +16,7 @@ from urllib.parse import urlsplit
 from uuid import UUID
 
 from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
@@ -46,6 +47,7 @@ class ChatInput(BaseModel):
     request_id: UUID
     web_search: bool = False
     language: Literal["vi", "en"] = "vi"
+    archive_slug: str | None = Field(default=None, max_length=70, pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
     @field_validator("text")
     @classmethod
@@ -157,11 +159,19 @@ def create_app(settings: Settings | None = None, *, model=None) -> FastAPI:
             if request.headers.get("sec-fetch-site") == "cross-site":
                 return JSONResponse({"detail": "Yêu cầu từ trang khác bị từ chối."}, status_code=403)
             try:
-                limit = 262144 if request.url.path == "/api/guest/messages" else 64000
+                limit = 262144 if request.url.path == "/api/guest/messages" else 131072 if request.url.path.startswith("/api/admin/archives/") else 64000
                 if int(request.headers.get("content-length", "0")) > limit:
                     return JSONResponse({"detail": "Yêu cầu quá lớn."}, status_code=413)
             except ValueError:
                 return JSONResponse({"detail": "Yêu cầu không hợp lệ."}, status_code=400)
+            # Content-Length can be omitted or dishonest. Bound the actual stream
+            # before JSON parsing, including chunked editorial requests.
+            chunks = bytearray()
+            async for chunk in request.stream():
+                chunks.extend(chunk)
+                if len(chunks) > limit:
+                    return JSONResponse({"detail": "Yêu cầu quá lớn."}, status_code=413)
+            request._body = bytes(chunks)
         cookie = request.cookies.get("amadeus_admin", "")
         value, _, signature = cookie.rpartition(".")
         authenticated = bool(settings.web_password and cookie and len(cookie) < 200
@@ -192,6 +202,9 @@ def create_app(settings: Settings | None = None, *, model=None) -> FastAPI:
             raise HTTPException(401, "Đăng nhập admin để mở lịch sử lưu trên máy chủ.")
         return request.state.owner
 
+    from .archives import register_archives
+    library = register_archives(app, store, owner)
+
     @app.exception_handler(ChatError)
     async def chat_error(request, error):
         return JSONResponse({"detail": str(error)}, status_code=error.status)
@@ -199,6 +212,12 @@ def create_app(settings: Settings | None = None, *, model=None) -> FastAPI:
     @app.exception_handler(ValueError)
     async def value_error(request, error):
         return JSONResponse({"detail": str(error)}, status_code=400)
+
+    @app.exception_handler(RequestValidationError)
+    async def invalid_input(request, error):
+        # Pydantic's default response echoes rejected inputs, including passwords.
+        fields = sorted({".".join(str(v) for v in item["loc"][1:]) or "body" for item in error.errors()})[:8]
+        return JSONResponse({"detail": "Dữ liệu không hợp lệ. Kiểm tra: " + ", ".join(fields) + "."}, status_code=422)
 
     @app.get("/health")
     async def health():
@@ -251,10 +270,11 @@ def create_app(settings: Settings | None = None, *, model=None) -> FastAPI:
 
     @app.post("/api/guest/messages")
     async def guest_message(body: GuestChatInput, request: Request):
+        reference = await library.reference(body.archive_slug, body.language) if body.archive_slug else None
         return stream_events(app.state.chat.guest_events(
             request.state.visitor, request.client.host if request.client else "local", body.mode, body.text, str(body.request_id),
             [message.model_dump() for message in body.history], [note.model_dump() for note in body.memories],
-            web_search=body.web_search, language=body.language))
+            web_search=body.web_search, language=body.language, reference=reference))
 
     @app.get("/api/sessions")
     async def sessions(identity=Depends(owner)):
@@ -291,8 +311,9 @@ def create_app(settings: Settings | None = None, *, model=None) -> FastAPI:
     @app.post("/api/sessions/{sid}/messages")
     async def message(sid: UUID, body: ChatInput, identity=Depends(owner)):
         await app.state.chat.require_session(identity, str(sid))
+        reference = await library.reference(body.archive_slug, body.language) if body.archive_slug else None
         return stream_events(app.state.chat.events(identity, str(sid), body.text, str(body.request_id),
-                                                   web_search=body.web_search, language=body.language))
+                                                   web_search=body.web_search, language=body.language, reference=reference))
 
     @app.get("/api/memories")
     async def memories(identity=Depends(owner)):
@@ -324,5 +345,16 @@ def create_app(settings: Settings | None = None, *, model=None) -> FastAPI:
     @app.get("/")
     async def index():
         return FileResponse(STATIC / "index.html")
+
+    # Explicit routes keep API/static 404s intact and support direct links/reloads.
+    @app.get("/explore")
+    @app.get("/archives")
+    @app.get("/archives/{slug}")
+    @app.get("/worldlines")
+    @app.get("/characters")
+    @app.get("/research")
+    @app.get("/editor")
+    async def explorer():
+        return FileResponse(STATIC / "explorer.html")
 
     return app
